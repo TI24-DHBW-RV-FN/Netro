@@ -1,0 +1,25 @@
+{
+    "name": "backend",
+    "version": "1.0.0",
+    "main": "index.js",
+    "description": "netro backend",
+    "license": "ISC",
+    "author": "",
+    "type": "module",
+    "keywords": [],
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit",
+        "start": "node dist/main.js",
+        "dev": "npx tsx watch main.ts",
+        "build": "npx tsc"
+    },
+    "dependencies": {
+        "express": "^4.22.1"
+    },
+    "devDependencies": {
+        "@types/express": "^5.0.6",
+        "ts-node": "^10.9.2",
+        "tsx": "^4.21.0",
+        "typescript": "^5.9.3"
+    }
+}
