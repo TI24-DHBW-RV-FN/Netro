@@ -1,4 +1,4 @@
-// feature/auth/login.ts
+// features/auth/login.tsx
 import { useState } from "react";
 
 export function useLogin() {
@@ -37,14 +37,17 @@ export function useLogin() {
             }
 
             const data = await response.json();
-            console.log("Logged in!", data);
+            if (process.env.NODE_ENV !== "production") {
+                console.log("Logged in!", data);
+            }
 
             // optionally store token, user, etc.
             // localStorage.setItem("token", data.token);
 
             return true;
-        } catch (err: any) {
-            setError(err.message || "Something went wrong");
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : "Something went wrong";
+            setError(message);
             return false;
         } finally {
             setLoading(false);
