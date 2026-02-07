@@ -3,6 +3,7 @@ import express from "express";
 import loginRouter from "./routes/login.js";
 import registerRouter from "./routes/register.js";
 import profileRouter from "./routes/profile.js";
+import editRouter from "./routes/edit.js";
 import { pool } from "./db.js";
 
 dotenv.config();
@@ -35,6 +36,7 @@ app.get("/health", async (req, res) => {
 app.use("/register", registerRouter);
 app.use("/login", loginRouter);
 app.use("/profile", profileRouter);
+app.use("/edit", editRouter);
 
 app.listen(PORT, () => {
     console.log(`🚀 Server is running on http://localhost:${PORT}`);
