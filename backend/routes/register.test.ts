@@ -4,13 +4,15 @@ import express from "express";
 import registerRouter from "./register.js";
 import * as hashPasswordModule from "../hash/hashPassword.js";
 import * as generateTokenModule from "../auth/generateToken.js";
+import * as validateRegistrationModule from "../helpers/validateRegistrationInput.js";
 import { pool } from "../db.js";
 
 vi.mock("../hash/hashPassword");
 vi.mock("../auth/generateToken");
+vi.mock("../helpers/validateRegistrationInput");
 vi.mock("../db", () => ({
     pool: {
-        query: vi.fn(),
+        connect: vi.fn(),
     },
 }));
 
@@ -19,12 +21,26 @@ app.use(express.json());
 app.use("/register", registerRouter);
 
 describe("POST /register", () => {
+    let mockClient: any;
+
     beforeEach(() => {
         vi.clearAllMocks();
         process.env.JWT_SECRET = "test-secret";
+
+        mockClient = {
+            query: vi.fn(),
+            release: vi.fn(),
+        };
+
+        vi.mocked(pool.connect).mockResolvedValue(mockClient);
     });
 
-    it("should return 400 if required fields are missing", async () => {
+    it("should return 400 if validation fails", async () => {
+        vi.mocked(validateRegistrationModule.validateRegistrationInput).mockReturnValue({
+            valid: false,
+            errors: ["Email is required and must be a string", "Password must be at least 8 characters long"],
+        });
+
         const response = await request(app).post("/register").send({
             email: "test@example.com",
         });
@@ -32,24 +48,29 @@ describe("POST /register", () => {
         expect(response.status).toBe(400);
         expect(response.body).toEqual({
             success: false,
-            message: "Email, password, first and last name are required",
+            message: "Validation failed",
+            errors: ["Email is required and must be a string", "Password must be at least 8 characters long"],
         });
     });
 
     it("should return 409 if user already exists", async () => {
-        vi.mocked(pool.query).mockResolvedValueOnce({
+        vi.mocked(validateRegistrationModule.validateRegistrationInput).mockReturnValue({
+            valid: true,
+            errors: [],
+        });
+
+        mockClient.query.mockResolvedValueOnce(undefined).mockResolvedValueOnce({
             rows: [{ id: 1 }],
             command: "",
             rowCount: 1,
             oid: 0,
             fields: [],
-        } as any);
+        });
 
         const response = await request(app).post("/register").send({
             email: "existing@example.com",
             password: "password123",
-            firstName: "John",
-            lastName: "Doe",
+            userName: "JohnDoe",
         });
 
         expect(response.status).toBe(409);
@@ -57,35 +78,31 @@ describe("POST /register", () => {
             success: false,
             message: "User with this email already exists",
         });
+        expect(mockClient.query).toHaveBeenCalledWith("ROLLBACK");
     });
 
-    it("should successfully register a new user", async () => {
+    it("should successfully register a new user without categories", async () => {
         const hashedPassword = "hashed_password_123";
         const token = "jwt_token_123";
         const newUser = {
             id: 1,
             email: "new@example.com",
-            first_name: "Jane",
-            last_name: "Smith",
+            user_name: "JaneSmith",
+            current_location: "New York",
+            bio: "Test bio",
             created_at: new Date("2024-01-01").toString(),
         };
 
-        vi.mocked(pool.query)
-            .mockResolvedValueOnce({
-                rows: [],
-                command: "",
-                rowCount: 0,
-                oid: 0,
-                fields: [],
-            } as any)
+        vi.mocked(validateRegistrationModule.validateRegistrationInput).mockReturnValue({
+            valid: true,
+            errors: [],
+        });
 
-            .mockResolvedValueOnce({
-                rows: [newUser],
-                command: "",
-                rowCount: 1,
-                oid: 0,
-                fields: [],
-            } as any);
+        mockClient.query
+            .mockResolvedValueOnce(undefined)
+            .mockResolvedValueOnce({ rows: [], command: "", rowCount: 0, oid: 0, fields: [] })
+            .mockResolvedValueOnce({ rows: [newUser], command: "", rowCount: 1, oid: 0, fields: [] })
+            .mockResolvedValueOnce(undefined);
 
         vi.mocked(hashPasswordModule.hashPassword).mockResolvedValue(hashedPassword);
         vi.mocked(generateTokenModule.generateToken).mockReturnValue(token);
@@ -93,8 +110,9 @@ describe("POST /register", () => {
         const response = await request(app).post("/register").send({
             email: "new@example.com",
             password: "password123",
-            firstName: "Jane",
-            lastName: "Smith",
+            userName: "JaneSmith",
+            currentLocation: "New York",
+            bio: "Test bio",
         });
 
         expect(response.status).toBe(201);
@@ -105,26 +123,148 @@ describe("POST /register", () => {
             user: {
                 id: newUser.id,
                 email: newUser.email,
-                firstName: newUser.first_name,
-                lastName: newUser.last_name,
+                userName: newUser.user_name,
+                currentLocation: newUser.current_location,
+                bio: newUser.bio,
+                categories: [],
                 createdAt: newUser.created_at,
             },
         });
+        expect(mockClient.query).toHaveBeenCalledWith("COMMIT");
+        expect(mockClient.release).toHaveBeenCalled();
+    });
+
+    it("should successfully register a new user with categories", async () => {
+        const hashedPassword = "hashed_password_123";
+        const token = "jwt_token_123";
+        const newUser = {
+            id: 1,
+            email: "new@example.com",
+            user_name: "JaneSmith",
+            current_location: "New York",
+            bio: "Test bio",
+            created_at: new Date("2024-01-01").toString(),
+        };
+
+        const categories = ["basketball", "programming"];
+        const mockCategories = [
+            { id: 1, name: "basketball" },
+            { id: 2, name: "programming" },
+        ];
+
+        vi.mocked(validateRegistrationModule.validateRegistrationInput).mockReturnValue({
+            valid: true,
+            errors: [],
+        });
+
+        mockClient.query
+            .mockResolvedValueOnce(undefined)
+            .mockResolvedValueOnce({ rows: [], command: "", rowCount: 0, oid: 0, fields: [] })
+            .mockResolvedValueOnce({ rows: [newUser], command: "", rowCount: 1, oid: 0, fields: [] })
+            .mockResolvedValueOnce({ rows: mockCategories, command: "", rowCount: 2, oid: 0, fields: [] })
+            .mockResolvedValueOnce({ rows: [], command: "", rowCount: 2, oid: 0, fields: [] })
+            .mockResolvedValueOnce(undefined);
+
+        vi.mocked(hashPasswordModule.hashPassword).mockResolvedValue(hashedPassword);
+        vi.mocked(generateTokenModule.generateToken).mockReturnValue(token);
+
+        const response = await request(app).post("/register").send({
+            email: "new@example.com",
+            password: "password123",
+            userName: "JaneSmith",
+            currentLocation: "New York",
+            bio: "Test bio",
+            categories: categories,
+        });
+
+        expect(response.status).toBe(201);
+        expect(response.body).toEqual({
+            success: true,
+            message: "Registration successful",
+            token,
+            user: {
+                id: newUser.id,
+                email: newUser.email,
+                userName: newUser.user_name,
+                currentLocation: newUser.current_location,
+                bio: newUser.bio,
+                categories: categories,
+                createdAt: newUser.created_at,
+            },
+        });
+        expect(mockClient.query).toHaveBeenCalledWith("COMMIT");
+        expect(mockClient.release).toHaveBeenCalled();
+    });
+
+    it("should return 400 if invalid categories are provided", async () => {
+        const hashedPassword = "hashed_password_123";
+        const newUser = {
+            id: 1,
+            email: "new@example.com",
+            user_name: "JaneSmith",
+            current_location: "New York",
+            bio: "Test bio",
+            created_at: new Date("2024-01-01").toString(),
+        };
+
+        const categories = ["basketball", "invalidCategory", "programming"];
+        const mockCategories = [
+            { id: 1, name: "basketball" },
+            { id: 2, name: "programming" },
+        ];
+
+        vi.mocked(validateRegistrationModule.validateRegistrationInput).mockReturnValue({
+            valid: true,
+            errors: [],
+        });
+
+        mockClient.query
+            .mockResolvedValueOnce(undefined)
+            .mockResolvedValueOnce({ rows: [], command: "", rowCount: 0, oid: 0, fields: [] })
+            .mockResolvedValueOnce({ rows: [newUser], command: "", rowCount: 1, oid: 0, fields: [] })
+            .mockResolvedValueOnce({ rows: mockCategories, command: "", rowCount: 2, oid: 0, fields: [] });
+
+        vi.mocked(hashPasswordModule.hashPassword).mockResolvedValue(hashedPassword);
+
+        const response = await request(app).post("/register").send({
+            email: "new@example.com",
+            password: "password123",
+            userName: "JaneSmith",
+            currentLocation: "New York",
+            bio: "Test bio",
+            categories: categories,
+        });
+
+        expect(response.status).toBe(400);
+        expect(response.body).toEqual({
+            success: false,
+            message: "Invalid categories provided",
+            invalidCategories: ["invalidCategory"],
+        });
+        expect(mockClient.query).toHaveBeenCalledWith("ROLLBACK");
+        expect(mockClient.release).toHaveBeenCalled();
     });
 
     it("should hash the password before storing", async () => {
         const password = "mySecurePassword";
         const hashedPassword = "hashed_password";
 
-        vi.mocked(pool.query)
-            .mockResolvedValueOnce({ rows: [], command: "", rowCount: 0, oid: 0, fields: [] } as any)
+        vi.mocked(validateRegistrationModule.validateRegistrationInput).mockReturnValue({
+            valid: true,
+            errors: [],
+        });
+
+        mockClient.query
+            .mockResolvedValueOnce(undefined)
+            .mockResolvedValueOnce({ rows: [], command: "", rowCount: 0, oid: 0, fields: [] })
             .mockResolvedValueOnce({
                 rows: [
                     {
                         id: 1,
                         email: "test@example.com",
-                        first_name: "Test",
-                        last_name: "User",
+                        user_name: "TestUser",
+                        current_location: null,
+                        bio: null,
                         created_at: new Date(),
                     },
                 ],
@@ -132,7 +272,8 @@ describe("POST /register", () => {
                 rowCount: 1,
                 oid: 0,
                 fields: [],
-            } as any);
+            })
+            .mockResolvedValueOnce(undefined);
 
         vi.mocked(hashPasswordModule.hashPassword).mockResolvedValue(hashedPassword);
         vi.mocked(generateTokenModule.generateToken).mockReturnValue("token");
@@ -140,28 +281,79 @@ describe("POST /register", () => {
         await request(app).post("/register").send({
             email: "test@example.com",
             password,
-            firstName: "Test",
-            lastName: "User",
+            userName: "TestUser",
         });
 
         expect(hashPasswordModule.hashPassword).toHaveBeenCalledWith(password);
-        expect(pool.query).toHaveBeenCalledWith(expect.stringContaining("INSERT INTO users"), expect.arrayContaining([hashedPassword]));
+        expect(mockClient.query).toHaveBeenCalledWith(
+            expect.stringContaining("INSERT INTO users"),
+            expect.arrayContaining(["test@example.com", hashedPassword]),
+        );
     });
 
-    it("should return 500 on database error", async () => {
-        vi.mocked(pool.query).mockRejectedValue(new Error("Database error"));
+    it("should rollback transaction on database error", async () => {
+        vi.mocked(validateRegistrationModule.validateRegistrationInput).mockReturnValue({
+            valid: true,
+            errors: [],
+        });
+
+        mockClient.query.mockResolvedValueOnce(undefined).mockRejectedValueOnce(new Error("Database error"));
 
         const response = await request(app).post("/register").send({
             email: "test@example.com",
             password: "password123",
-            firstName: "John",
-            lastName: "Doe",
+            userName: "JohnDoe",
         });
 
         expect(response.status).toBe(500);
         expect(response.body).toEqual({
             success: false,
             message: "Registration failed",
+        });
+        expect(mockClient.query).toHaveBeenCalledWith("ROLLBACK");
+        expect(mockClient.release).toHaveBeenCalled();
+    });
+
+    it("should handle missing optional fields", async () => {
+        const hashedPassword = "hashed_password_123";
+        const token = "jwt_token_123";
+        const newUser = {
+            id: 1,
+            email: "new@example.com",
+            user_name: null,
+            current_location: null,
+            bio: null,
+            created_at: new Date("2024-01-01").toString(),
+        };
+
+        vi.mocked(validateRegistrationModule.validateRegistrationInput).mockReturnValue({
+            valid: true,
+            errors: [],
+        });
+
+        mockClient.query
+            .mockResolvedValueOnce(undefined)
+            .mockResolvedValueOnce({ rows: [], command: "", rowCount: 0, oid: 0, fields: [] })
+            .mockResolvedValueOnce({ rows: [newUser], command: "", rowCount: 1, oid: 0, fields: [] })
+            .mockResolvedValueOnce(undefined);
+
+        vi.mocked(hashPasswordModule.hashPassword).mockResolvedValue(hashedPassword);
+        vi.mocked(generateTokenModule.generateToken).mockReturnValue(token);
+
+        const response = await request(app).post("/register").send({
+            email: "new@example.com",
+            password: "password123",
+        });
+
+        expect(response.status).toBe(201);
+        expect(response.body.user).toEqual({
+            id: newUser.id,
+            email: newUser.email,
+            userName: null,
+            currentLocation: null,
+            bio: null,
+            categories: [],
+            createdAt: newUser.created_at,
         });
     });
 });

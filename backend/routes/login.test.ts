@@ -36,6 +36,19 @@ describe("POST /login", () => {
         });
     });
 
+    it("should return 400 if email format is invalid", async () => {
+        const response = await request(app).post("/login").send({
+            email: "invalid-email",
+            password: "password123",
+        });
+
+        expect(response.status).toBe(400);
+        expect(response.body).toEqual({
+            success: false,
+            message: "Invalid email format",
+        });
+    });
+
     it("should return 401 if user is not found", async () => {
         vi.mocked(pool.query).mockResolvedValueOnce({
             rows: [],
@@ -62,8 +75,9 @@ describe("POST /login", () => {
             id: 1,
             email: "test@example.com",
             password_hash: "hashed_password",
-            first_name: "John",
-            last_name: "Doe",
+            user_name: "JohnDoe",
+            current_location: "New York",
+            bio: "Test bio",
         };
 
         vi.mocked(pool.query).mockResolvedValueOnce({
@@ -93,13 +107,17 @@ describe("POST /login", () => {
             id: 1,
             email: "test@example.com",
             password_hash: "hashed_password",
-            first_name: "John",
-            last_name: "Doe",
+            user_name: "JohnDoe",
+            current_location: "New York",
+            bio: "Test bio",
         };
+
+        const mockCategories = [{ name: "basketball" }, { name: "programming" }];
 
         const token = "jwt_token_123";
 
         vi.mocked(pool.query)
+            // First call: Get user
             .mockResolvedValueOnce({
                 rows: [mockUser],
                 command: "",
@@ -107,11 +125,19 @@ describe("POST /login", () => {
                 oid: 0,
                 fields: [],
             } as any)
-
+            // Second call: Update last_login
             .mockResolvedValueOnce({
                 rows: [],
                 command: "",
                 rowCount: 1,
+                oid: 0,
+                fields: [],
+            } as any)
+            // Third call: Get categories
+            .mockResolvedValueOnce({
+                rows: mockCategories,
+                command: "",
+                rowCount: 2,
                 oid: 0,
                 fields: [],
             } as any);
@@ -132,8 +158,10 @@ describe("POST /login", () => {
             user: {
                 id: mockUser.id,
                 email: mockUser.email,
-                firstName: mockUser.first_name,
-                lastName: mockUser.last_name,
+                userName: mockUser.user_name,
+                currentLocation: mockUser.current_location,
+                bio: mockUser.bio,
+                categories: ["basketball", "programming"],
             },
         });
     });
@@ -143,11 +171,13 @@ describe("POST /login", () => {
             id: 1,
             email: "test@example.com",
             password_hash: "hashed_password",
-            first_name: "John",
-            last_name: "Doe",
+            user_name: "JohnDoe",
+            current_location: "New York",
+            bio: "Test bio",
         };
 
         vi.mocked(pool.query)
+            // First call: Get user
             .mockResolvedValueOnce({
                 rows: [mockUser],
                 command: "",
@@ -155,10 +185,19 @@ describe("POST /login", () => {
                 oid: 0,
                 fields: [],
             } as any)
+            // Second call: Update last_login
             .mockResolvedValueOnce({
                 rows: [],
                 command: "",
                 rowCount: 1,
+                oid: 0,
+                fields: [],
+            } as any)
+            // Third call: Get categories
+            .mockResolvedValueOnce({
+                rows: [],
+                command: "",
+                rowCount: 0,
                 oid: 0,
                 fields: [],
             } as any);
@@ -172,6 +211,56 @@ describe("POST /login", () => {
         });
 
         expect(pool.query).toHaveBeenCalledWith("UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = $1", [mockUser.id]);
+    });
+
+    it("should return empty categories array if user has no categories", async () => {
+        const mockUser = {
+            id: 1,
+            email: "test@example.com",
+            password_hash: "hashed_password",
+            user_name: "JohnDoe",
+            current_location: null,
+            bio: null,
+        };
+
+        const token = "jwt_token_123";
+
+        vi.mocked(pool.query)
+            // First call: Get user
+            .mockResolvedValueOnce({
+                rows: [mockUser],
+                command: "",
+                rowCount: 1,
+                oid: 0,
+                fields: [],
+            } as any)
+            // Second call: Update last_login
+            .mockResolvedValueOnce({
+                rows: [],
+                command: "",
+                rowCount: 1,
+                oid: 0,
+                fields: [],
+            } as any)
+            // Third call: Get categories (empty)
+            .mockResolvedValueOnce({
+                rows: [],
+                command: "",
+                rowCount: 0,
+                oid: 0,
+                fields: [],
+            } as any);
+
+        vi.mocked(comparePasswordModule.comparePassword).mockResolvedValue(true);
+        vi.mocked(generateTokenModule.generateToken).mockReturnValue(token);
+
+        const response = await request(app).post("/login").send({
+            email: "test@example.com",
+            password: "correctpassword",
+        });
+
+        expect(response.status).toBe(200);
+        expect(response.body.user.categories).toEqual([]);
     });
 
     it("should return 500 on database error", async () => {
