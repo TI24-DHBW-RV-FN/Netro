@@ -4,15 +4,12 @@ import { authenticateToken } from "../auth/authenticateToken.js";
 
 const router = Router();
 
-// Protected route - requires JWT token
 router.get("/", authenticateToken, async (req: Request, res: Response) => {
     try {
-        // req.user is now typed thanks to types/express.d.ts
-        const userId = req.user!.userId;
+        const userId = (req as any).user.userId;
 
-        // Fetch user from database
         const result = await pool.query(
-            `SELECT id, email, first_name, last_name, created_at, last_login 
+            `SELECT id, email, user_name, current_location, bio, created_at, last_login 
              FROM users 
              WHERE id = $1`,
             [userId],
@@ -32,8 +29,9 @@ router.get("/", authenticateToken, async (req: Request, res: Response) => {
             user: {
                 id: user.id,
                 email: user.email,
-                firstName: user.first_name,
-                lastName: user.last_name,
+                userName: user.user_name,
+                currentLocation: user.current_location,
+                bio: user.bio,
                 createdAt: user.created_at,
                 lastLogin: user.last_login,
             },

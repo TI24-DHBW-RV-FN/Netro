@@ -1,4 +1,4 @@
-export function validateRegistrationInput(data: any): { valid: boolean; errors: string[] } {
+export function validateAllUserInput(data: any): { valid: boolean; errors: string[] } {
     const errors: string[] = [];
 
     // Required fields

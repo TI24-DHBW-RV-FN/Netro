@@ -2,8 +2,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import request from "supertest";
 import express from "express";
 import jwt from "jsonwebtoken";
-import profileRouter from "./profile";
-import { pool } from "../db";
+import profileRouter from "./profile.js";
+import { pool } from "../db.js";
 
 vi.mock("../db", () => ({
     pool: {
@@ -47,8 +47,9 @@ describe("GET /profile", () => {
         const mockUser = {
             id: 1,
             email: "test@example.com",
-            first_name: "John",
-            last_name: "Doe",
+            user_name: "hi", // ✅ Changed from userName to user_name (database column name)
+            current_location: null, // ✅ Add this
+            bio: null, // ✅ Add this
             created_at: new Date("2024-01-01"),
             last_login: new Date("2024-02-01"),
         };
@@ -71,8 +72,9 @@ describe("GET /profile", () => {
             user: {
                 id: mockUser.id,
                 email: mockUser.email,
-                firstName: mockUser.first_name,
-                lastName: mockUser.last_name,
+                userName: mockUser.user_name, // ✅ The response converts to camelCase
+                currentLocation: mockUser.current_location, // ✅ Add this
+                bio: mockUser.bio, // ✅ Add this
                 createdAt: mockUser.created_at.toISOString(),
                 lastLogin: mockUser.last_login.toISOString(),
             },
