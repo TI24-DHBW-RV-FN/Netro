@@ -1,10 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { validateRegistrationInput } from "./validateRegistrationInput.js";
+import { validateAllUserInput } from "./validateAllUserInput.js";
 
-describe("validateRegistrationInput", () => {
+describe("validateAllUserInput", () => {
     describe("Email validation", () => {
         it("should pass with valid email", () => {
-            const result = validateRegistrationInput({
+            const result = validateAllUserInput({
                 email: "test@example.com",
                 password: "password123",
             });
@@ -14,7 +14,7 @@ describe("validateRegistrationInput", () => {
         });
 
         it("should fail when email is missing", () => {
-            const result = validateRegistrationInput({
+            const result = validateAllUserInput({
                 password: "password123",
             });
 
@@ -23,7 +23,7 @@ describe("validateRegistrationInput", () => {
         });
 
         it("should fail when email is not a string", () => {
-            const result = validateRegistrationInput({
+            const result = validateAllUserInput({
                 email: 123,
                 password: "password123",
             });
@@ -33,7 +33,7 @@ describe("validateRegistrationInput", () => {
         });
 
         it("should fail when email format is invalid", () => {
-            const result = validateRegistrationInput({
+            const result = validateAllUserInput({
                 email: "invalid-email",
                 password: "password123",
             });
@@ -46,7 +46,7 @@ describe("validateRegistrationInput", () => {
             const invalidEmails = ["test", "test@", "@example.com", "test @example.com"];
 
             invalidEmails.forEach((email) => {
-                const result = validateRegistrationInput({
+                const result = validateAllUserInput({
                     email,
                     password: "password123",
                 });
@@ -59,7 +59,7 @@ describe("validateRegistrationInput", () => {
 
     describe("Password validation", () => {
         it("should pass with valid password", () => {
-            const result = validateRegistrationInput({
+            const result = validateAllUserInput({
                 email: "test@example.com",
                 password: "password123",
             });
@@ -69,7 +69,7 @@ describe("validateRegistrationInput", () => {
         });
 
         it("should fail when password is missing", () => {
-            const result = validateRegistrationInput({
+            const result = validateAllUserInput({
                 email: "test@example.com",
             });
 
@@ -78,7 +78,7 @@ describe("validateRegistrationInput", () => {
         });
 
         it("should fail when password is not a string", () => {
-            const result = validateRegistrationInput({
+            const result = validateAllUserInput({
                 email: "test@example.com",
                 password: 12345678,
             });
@@ -88,7 +88,7 @@ describe("validateRegistrationInput", () => {
         });
 
         it("should fail when password is too short", () => {
-            const result = validateRegistrationInput({
+            const result = validateAllUserInput({
                 email: "test@example.com",
                 password: "short",
             });
@@ -100,7 +100,7 @@ describe("validateRegistrationInput", () => {
 
     describe("Optional fields validation", () => {
         it("should pass with valid optional fields", () => {
-            const result = validateRegistrationInput({
+            const result = validateAllUserInput({
                 email: "test@example.com",
                 password: "password123",
                 userName: "JohnDoe",
@@ -114,7 +114,7 @@ describe("validateRegistrationInput", () => {
         });
 
         it("should pass when optional fields are missing", () => {
-            const result = validateRegistrationInput({
+            const result = validateAllUserInput({
                 email: "test@example.com",
                 password: "password123",
             });
@@ -124,7 +124,7 @@ describe("validateRegistrationInput", () => {
         });
 
         it("should fail when userName is not a string", () => {
-            const result = validateRegistrationInput({
+            const result = validateAllUserInput({
                 email: "test@example.com",
                 password: "password123",
                 userName: 123,
@@ -135,7 +135,7 @@ describe("validateRegistrationInput", () => {
         });
 
         it("should fail when userName exceeds 100 characters", () => {
-            const result = validateRegistrationInput({
+            const result = validateAllUserInput({
                 email: "test@example.com",
                 password: "password123",
                 userName: "a".repeat(101),
@@ -146,7 +146,7 @@ describe("validateRegistrationInput", () => {
         });
 
         it("should fail when currentLocation is not a string", () => {
-            const result = validateRegistrationInput({
+            const result = validateAllUserInput({
                 email: "test@example.com",
                 password: "password123",
                 currentLocation: 123,
@@ -157,7 +157,7 @@ describe("validateRegistrationInput", () => {
         });
 
         it("should fail when currentLocation exceeds 100 characters", () => {
-            const result = validateRegistrationInput({
+            const result = validateAllUserInput({
                 email: "test@example.com",
                 password: "password123",
                 currentLocation: "a".repeat(101),
@@ -168,7 +168,7 @@ describe("validateRegistrationInput", () => {
         });
 
         it("should fail when bio is not a string", () => {
-            const result = validateRegistrationInput({
+            const result = validateAllUserInput({
                 email: "test@example.com",
                 password: "password123",
                 bio: 123,
@@ -179,7 +179,7 @@ describe("validateRegistrationInput", () => {
         });
 
         it("should fail when bio exceeds 100 characters", () => {
-            const result = validateRegistrationInput({
+            const result = validateAllUserInput({
                 email: "test@example.com",
                 password: "password123",
                 bio: "a".repeat(101),
@@ -190,7 +190,7 @@ describe("validateRegistrationInput", () => {
         });
 
         it("should pass when optional fields are null", () => {
-            const result = validateRegistrationInput({
+            const result = validateAllUserInput({
                 email: "test@example.com",
                 password: "password123",
                 userName: null,
@@ -206,7 +206,7 @@ describe("validateRegistrationInput", () => {
 
     describe("Categories validation", () => {
         it("should pass with valid categories array", () => {
-            const result = validateRegistrationInput({
+            const result = validateAllUserInput({
                 email: "test@example.com",
                 password: "password123",
                 categories: ["basketball", "football", "programming"],
@@ -217,7 +217,7 @@ describe("validateRegistrationInput", () => {
         });
 
         it("should pass with empty categories array", () => {
-            const result = validateRegistrationInput({
+            const result = validateAllUserInput({
                 email: "test@example.com",
                 password: "password123",
                 categories: [],
@@ -228,7 +228,7 @@ describe("validateRegistrationInput", () => {
         });
 
         it("should fail when categories is not an array", () => {
-            const result = validateRegistrationInput({
+            const result = validateAllUserInput({
                 email: "test@example.com",
                 password: "password123",
                 categories: "basketball",
@@ -239,7 +239,7 @@ describe("validateRegistrationInput", () => {
         });
 
         it("should fail when categories contains non-string values", () => {
-            const result = validateRegistrationInput({
+            const result = validateAllUserInput({
                 email: "test@example.com",
                 password: "password123",
                 categories: ["basketball", 123, "football"],
@@ -252,7 +252,7 @@ describe("validateRegistrationInput", () => {
 
     describe("Multiple validation errors", () => {
         it("should return all validation errors", () => {
-            const result = validateRegistrationInput({
+            const result = validateAllUserInput({
                 email: "invalid-email",
                 password: "short",
                 userName: 123,

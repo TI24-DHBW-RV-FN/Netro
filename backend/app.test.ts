@@ -10,8 +10,8 @@ vi.mock("./db", () => ({
     },
 }));
 
-vi.mock("./helpers/validateRegistrationInput", () => ({
-    validateRegistrationInput: vi.fn(() => ({
+vi.mock("./helpers/validateAllUserInput", () => ({
+    validateAllUserInput: vi.fn(() => ({
         valid: false,
         errors: ["Email and password are required"],
     })),

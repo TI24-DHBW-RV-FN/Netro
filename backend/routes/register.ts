@@ -2,7 +2,7 @@ import { Router, Request, Response } from "express";
 import { pool } from "../db.js";
 import { hashPassword } from "../hash/hashPassword.js";
 import { generateToken } from "../auth/generateToken.js";
-import { validateRegistrationInput } from "../helpers/validateRegistrationInput.js";
+import { validateAllUserInput } from "../helpers/validateAllUserInput.js";
 
 const router = Router();
 
@@ -10,7 +10,7 @@ router.post("/", async (req: Request, res: Response) => {
     const client = await pool.connect();
 
     try {
-        const validation = validateRegistrationInput(req.body);
+        const validation = validateAllUserInput(req.body);
         if (!validation.valid) {
             return res.status(400).json({
                 success: false,
