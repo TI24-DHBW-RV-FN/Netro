@@ -9,14 +9,77 @@ CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
-    first_name VARCHAR(100),
-    last_name VARCHAR(100),
+    user_name VARCHAR(100),
+    current_location VATCHAR(100),
+    bio VARCHAR(100),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     last_login TIMESTAMP
 );
 -- Index for faster email lookups
 CREATE INDEX idx_users_email ON users(email);
+-- --------------------------------------------------------
+-- CATEGORIES TABLE
+-- --------------------------------------------------------
+CREATE TABLE categories (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+-- Index for faster category name lookups
+CREATE INDEX idx_categories_name ON categories(name);
+-- --------------------------------------------------------
+-- USER_CATEGORIES (Many-to-Many Junction Table)
+-- --------------------------------------------------------
+CREATE TABLE user_categories (
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    category_id INTEGER NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, category_id)
+);
+-- Indexes for faster lookups
+CREATE INDEX idx_user_categories_user_id ON user_categories(user_id);
+CREATE INDEX idx_user_categories_category_id ON user_categories(category_id);
+-- --------------------------------------------------------
+-- GRANT PERMISSIONS FOR NEW TABLES
+-- --------------------------------------------------------
+GRANT SELECT,
+    INSERT,
+    UPDATE,
+    DELETE ON categories TO netro_app;
+GRANT SELECT,
+    INSERT,
+    UPDATE,
+    DELETE ON user_categories TO netro_app;
+GRANT USAGE,
+    SELECT ON SEQUENCE categories_id_seq TO netro_app;
+GRANT ALL PRIVILEGES ON categories TO netro_admin;
+GRANT ALL PRIVILEGES ON user_categories TO netro_admin;
+GRANT ALL PRIVILEGES ON SEQUENCE categories_id_seq TO netro_admin;
+-- --------------------------------------------------------
+-- SEED CATEGORIES (Optional)
+-- --------------------------------------------------------
+INSERT INTO categories (name)
+VALUES ('basketball'),
+    ('football'),
+    ('soccer'),
+    ('tennis'),
+    ('swimming'),
+    ('running'),
+    ('cycling'),
+    ('gaming'),
+    ('reading'),
+    ('cooking'),
+    ('music'),
+    ('photography'),
+    ('painting'),
+    ('writing'),
+    ('hiking'),
+    ('yoga'),
+    ('dancing'),
+    ('programming'),
+    ('gardening'),
+    ('traveling');
 -- --------------------------------------------------------
 -- DATABASE ROLES
 -- --------------------------------------------------------
