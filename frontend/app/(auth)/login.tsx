@@ -5,14 +5,15 @@ import { useLogin } from "../../features/auth/login"; // import your hook
 
 
 export default function LoginScreen() {
-    const { email, setEmail, password, setPassword, error, login } = useLogin();
+    const { email, setEmail, password, setPassword, error, login, loading } = useLogin();
 
     const handleLogin = async () => {
         const success = await login();
         if (success) {
-            router.replace("/"); // ToDo: navigate to main app
+            // no navigation needed!
         }
     };
+
     return (
         <View style={authStyles.container}>
             <TouchableOpacity style={authStyles.button} onPress={() => router.back()}>
@@ -28,6 +29,8 @@ export default function LoginScreen() {
                 style={authStyles.input}
                 placeholder="E-Mail"
                 keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
                 value={email}
                 onChangeText={setEmail}
             />
