@@ -99,7 +99,7 @@ export default function SignupCategoriesScreen() {
     return (
         <View style={authStyles.container}>
             <TouchableOpacity style={authStyles.button} onPress={() => router.back()}>
-                <Text style={authStyles.text}>Go Back</Text>
+                <Text style={authStyles.buttonText}>Go Back</Text>
             </TouchableOpacity>
 
             <Text style={authStyles.title}>Sign Up</Text>
