@@ -10,7 +10,7 @@ function isValidEmail(email: string) {
 export function useSubmitSignup() {
     const { email, password, username, location, bio, categories} = useSignup();
 
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     const submitSignup = async () => {
@@ -32,7 +32,9 @@ export function useSubmitSignup() {
                     currentLocation: location,
                     bio: bio,
                     categories: categories,
-                })
+                });
+
+            return !!data;
 
         } catch ( err: unknown) {
             const message = err instanceof Error ? err.message : "Something went wrong";
