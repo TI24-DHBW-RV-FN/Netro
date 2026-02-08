@@ -1,4 +1,4 @@
-import { Stack,Redirect } from "expo-router";
+import { Stack, Redirect } from "expo-router";
 import { useAuth } from "../../features/auth/authContext";
 import { createContext, useContext, useState } from 'react';
 
@@ -43,7 +43,7 @@ export default function AuthLayout() {
     if (isLoading) return null;
 
     //if (isAuthenticated) {
-    //    return <Redirect href="/(tabs)/home" />;
+    //    return <Redirect href="/(tabs)/home" />;      //ToDo: Comment in, as soon as landingpage exists
     //}
 
     return (
