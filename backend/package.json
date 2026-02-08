@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "main": "index.js",
     "description": "netro backend",
-    "license": "ISC",
+    "license": "MIT",
     "author": "",
     "type": "module",
     "keywords": [],
@@ -14,9 +14,7 @@
         "build": "npx tsc"
     },
     "dependencies": {
-        "dotenv": "^17.2.4",
-        "express": "^4.22.1",
-        "nodemailer": "^8.0.1"
+        "nodemailer": "^8.0.1",
         "bcrypt": "^6.0.0",
         "dotenv": "^17.2.4",
         "express": "^4.22.1",
