@@ -4,6 +4,7 @@ import express from "express";
 import jwt from "jsonwebtoken";
 import profileRouter from "./profile.js";
 import { pool } from "../db.js";
+import { generateToken } from "../token/generateToken.js";
 
 vi.mock("../db", () => ({
     pool: {
@@ -46,20 +47,35 @@ describe("GET /profile", () => {
     it("should return user profile for authenticated user", async () => {
         const mockUser = {
             id: 1,
-            email: "test@example.com",
-            user_name: "hi", // ✅ Changed from userName to user_name (database column name)
-            current_location: null, // ✅ Add this
-            bio: null, // ✅ Add this
+            user_name: "hi",
+            current_location: null,
+            bio: null,
             created_at: new Date("2024-01-01"),
+            updated_at: new Date("2024-01-15"),
             last_login: new Date("2024-02-01"),
         };
 
+        const mockCategories = [
+            { id: 1, name: "basketball" },
+            { id: 2, name: "programming" },
+        ];
+
         const token = jwt.sign({ userId: 1, email: "test@example.com" }, JWT_SECRET, { expiresIn: "1d" });
 
+        // Mock first query (user data)
         vi.mocked(pool.query).mockResolvedValueOnce({
             rows: [mockUser],
             command: "",
             rowCount: 1,
+            oid: 0,
+            fields: [],
+        } as any);
+
+        // Mock second query (categories)
+        vi.mocked(pool.query).mockResolvedValueOnce({
+            rows: mockCategories,
+            command: "",
+            rowCount: 2,
             oid: 0,
             fields: [],
         } as any);
@@ -71,12 +87,16 @@ describe("GET /profile", () => {
             success: true,
             user: {
                 id: mockUser.id,
-                email: mockUser.email,
-                userName: mockUser.user_name, // ✅ The response converts to camelCase
-                currentLocation: mockUser.current_location, // ✅ Add this
-                bio: mockUser.bio, // ✅ Add this
+                userName: mockUser.user_name,
+                currentLocation: mockUser.current_location,
+                bio: mockUser.bio,
                 createdAt: mockUser.created_at.toISOString(),
+                updatedAt: mockUser.updated_at.toISOString(),
                 lastLogin: mockUser.last_login.toISOString(),
+                categories: [
+                    { id: 1, name: "basketball" },
+                    { id: 2, name: "programming" },
+                ],
             },
         });
     });
@@ -104,19 +124,30 @@ describe("GET /profile", () => {
     it("should query the correct user from the token", async () => {
         const token = jwt.sign({ userId: 42, email: "specific@example.com" }, JWT_SECRET, { expiresIn: "1d" });
 
+        // Mock first query (user data)
         vi.mocked(pool.query).mockResolvedValueOnce({
             rows: [
                 {
                     id: 42,
-                    email: "specific@example.com",
-                    first_name: "Jane",
-                    last_name: "Smith",
+                    user_name: "Jane",
+                    current_location: null,
+                    bio: null,
                     created_at: new Date(),
+                    updated_at: new Date(),
                     last_login: new Date(),
                 },
             ],
             command: "",
             rowCount: 1,
+            oid: 0,
+            fields: [],
+        } as any);
+
+        // Mock second query (categories)
+        vi.mocked(pool.query).mockResolvedValueOnce({
+            rows: [],
+            command: "",
+            rowCount: 0,
             oid: 0,
             fields: [],
         } as any);
