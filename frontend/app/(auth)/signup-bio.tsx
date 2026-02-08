@@ -3,7 +3,7 @@ import { authStyles } from "./styles";
 import {router} from "expo-router";
 import { useSignup } from "./_layout";
 
-export default function LoginScreen() {
+export default function SignupBioScreen() {
     const { bio, updateBio } = useSignup();
 
     return (

@@ -4,7 +4,7 @@ import {router} from "expo-router";
 import { useSignup } from "./_layout";
 import { useSubmitSignup} from "../../features/auth/signup";
 
-export default function LoginScreen() {
+export default function SignupConfirmationScreen() {
     const { email, username, location, bio} = useSignup();
 
     const { error, submitSignup} = useSubmitSignup();

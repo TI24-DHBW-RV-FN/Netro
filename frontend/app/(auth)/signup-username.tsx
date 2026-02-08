@@ -5,7 +5,7 @@ import { useSignup } from "./_layout";
 
 
 
-export default function LoginScreen() {
+export default function SignupUsernameScreen() {
     const { username, updateUsername } = useSignup();
 
     return (
