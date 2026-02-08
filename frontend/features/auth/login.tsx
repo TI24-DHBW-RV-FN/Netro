@@ -1,7 +1,11 @@
-// features/auth/login.tsx
 import { useState } from "react";
+import { loginApi } from "./api";
+import { env } from "../../config/env"
+import { useAuth } from "./authContext";
 
 export function useLogin() {
+    const { signIn } = useAuth();
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
@@ -19,27 +23,13 @@ export function useLogin() {
                 throw new Error("Please enter a valid email address");
             }
 
-            const response = await fetch("http://localhost:3000/login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    "email":email,
-                    "password":password,
-                }),
-            });
+            const data = await loginApi({ email, password });
 
-            if (!response.ok) {
-                // try to read backend error message
-                const data = await response.json().catch(() => null);
-                throw new Error(data?.message || "Login failed");
-            }
-
-            const data = await response.json();
-            if (process.env.NODE_ENV !== "production") {
+            if (env.type == "dev") {
                 console.log("Logged in!", data);
             }
+
+            await signIn(data.token, data.user);
 
             // optionally store token, user, etc.
             // localStorage.setItem("token", data.token);
@@ -54,10 +44,6 @@ export function useLogin() {
         }
     };
 
-    const isValidEmail = (email: string) => {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    };
-
     return {
         email,
         setEmail,
@@ -67,4 +53,8 @@ export function useLogin() {
         error,
         login,
     };
+}
+
+function isValidEmail(email: string) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
