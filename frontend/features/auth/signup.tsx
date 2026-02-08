@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { signupApi } from "./api";
 import { useSignup } from "../../app/(auth)/_layout";
-
+import { useAuth } from "./authContext";
+import {router} from "expo-router";
 
 function isValidEmail(email: string) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -9,6 +10,7 @@ function isValidEmail(email: string) {
 
 export function useSubmitSignup() {
     const { email, password, username, location, bio, categories} = useSignup();
+    const { signIn } = useAuth();
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -34,8 +36,9 @@ export function useSubmitSignup() {
                     categories: categories,
                 });
 
-            return !!data;
-
+            await signIn(data.token, data.user);
+            router.replace("/");
+            
         } catch ( err: unknown) {
             const message = err instanceof Error ? err.message : "Something went wrong";
             setError(message);
