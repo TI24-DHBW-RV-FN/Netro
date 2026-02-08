@@ -1,20 +1,14 @@
-export function validateAllUserInput(data: any): { valid: boolean; errors: string[] } {
+export function validateProfileUpdate(data: any): { valid: boolean; errors: string[] } {
     const errors: string[] = [];
 
-    // Required fields
-    if (!data.email || typeof data.email !== "string") {
-        errors.push("Email is required and must be a string");
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-        errors.push("Email must be a valid email address");
+    if (data.email !== undefined) {
+        errors.push("Email cannot be changed through this endpoint");
     }
 
-    if (!data.password || typeof data.password !== "string") {
-        errors.push("Password is required and must be a string");
-    } else if (data.password.length < 8) {
-        errors.push("Password must be at least 8 characters long");
+    if (data.password !== undefined) {
+        errors.push("Password cannot be changed through this endpoint");
     }
 
-    // Optional fields with type checking
     if (data.userName !== undefined && data.userName !== null) {
         if (typeof data.userName !== "string") {
             errors.push("userName must be a string");
