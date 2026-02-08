@@ -63,6 +63,57 @@ router.post("/password", authenticateToken, async (req: Request, res: Response) 
     }
 });
 
+router.post("/email", authenticateToken, async (req: Request, res: Response) => {
+    try {
+        const { oldEmail, newEmail } = req.body;
+        const userId = (req as any).user.userId;
+
+        if (!oldEmail || !newEmail) {
+            return res.status(400).json({
+                success: false,
+                message: "Old password and new password are required",
+            });
+        }
+
+        const userResult = await pool.query("SELECT email FROM users WHERE id = $1", [userId]);
+
+        if (userResult.rows.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            });
+        }
+
+        const currentEmail = userResult.rows[0].email;
+
+        if (oldEmail !== currentEmail) {
+            return res.status(401).json({
+                success: false,
+                message: "Current email is incorrect",
+            });
+        }
+
+        // verify new email
+        // verify new email
+        // verify new email
+        // verify new email
+        // verify new email
+
+        await pool.query("UPDATE users SET email = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2", [newEmail, userId]);
+
+        res.json({
+            success: true,
+            message: "Email updated successfully",
+        });
+    } catch (error) {
+        console.error("Email change error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to update email",
+        });
+    }
+});
+
 router.post("/profile", authenticateToken, async (req: Request, res: Response) => {
     const client = await pool.connect();
 
@@ -136,12 +187,12 @@ router.post("/profile", authenticateToken, async (req: Request, res: Response) =
             const updateQuery = `
                 UPDATE users 
                 SET ${updateFields.join(", ")} 
-                WHERE id = $${paramCount}
-            `;
+                WHERE id = $${paramCount} 
+                `;
 
             await client.query(updateQuery, updateValues);
         }
-
+        // $x this represents the indices of the Values that are in updateValues. updateValues last Value will always be the User Id
         // Handle categories update
         if (categories !== undefined && Array.isArray(categories)) {
             // Validate categories exist
@@ -150,7 +201,7 @@ router.post("/profile", authenticateToken, async (req: Request, res: Response) =
 
                 if (categoryCheck.rows.length !== categories.length) {
                     await client.query("ROLLBACK");
-                    const validCategories = categoryCheck.rows.map((c) => c.name);
+                    const validCategories = categoryCheck.rows.map((c: any) => c.name);
                     const invalidCategories = categories.filter((categoryName: string) => !validCategories.includes(categoryName));
                     return res.status(400).json({
                         success: false,
@@ -163,8 +214,8 @@ router.post("/profile", authenticateToken, async (req: Request, res: Response) =
                 await client.query("DELETE FROM user_categories WHERE user_id = $1", [userId]);
 
                 // Insert new categories
-                const categoryIds = categoryCheck.rows.map((c) => c.id);
-                const insertValues = categoryIds.map((catId) => `(${userId}, ${catId})`).join(", ");
+                const categoryIds = categoryCheck.rows.map((c: any) => c.id);
+                const insertValues = categoryIds.map((catId: any) => `(${userId}, ${catId})`).join(", ");
 
                 await client.query(`INSERT INTO user_categories (user_id, category_id) VALUES ${insertValues}`);
             } else {

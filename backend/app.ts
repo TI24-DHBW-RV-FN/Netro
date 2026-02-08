@@ -4,6 +4,7 @@ import loginRouter from "./routes/login.js";
 import registerRouter from "./routes/register.js";
 import profileRouter from "./routes/profile.js";
 import editRouter from "./routes/edit.js";
+import categoryRouter from "./routes/category.js";
 import { pool } from "./db.js";
 
 dotenv.config();
@@ -37,6 +38,7 @@ app.use("/register", registerRouter);
 app.use("/login", loginRouter);
 app.use("/profile", profileRouter);
 app.use("/edit", editRouter);
+app.use("/category", categoryRouter);
 
 app.listen(PORT, () => {
     console.log(`🚀 Server is running on http://localhost:${PORT}`);
