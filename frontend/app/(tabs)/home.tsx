@@ -1,14 +1,17 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, ScrollView } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { homeStyles, themeColors } from "../../constants/styles";
 
 export default function HomeLandingPage() {
     return (
-        <View style={styles.container}>
-            <Text style={styles.text}>Willkommen auf deinem Feed!</Text>
-        </View>
+        <SafeAreaView style={homeStyles.container}>
+            <View style={homeStyles.header}>
+                <Text style={homeStyles.headerTitle}>Netro Feed</Text>
+            </View>
+
+            <ScrollView contentContainerStyle={homeStyles.feedContainer}>
+
+            </ScrollView>
+        </SafeAreaView>
     );
 }
-
-const styles = StyleSheet.create({
-    container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-    text: { fontSize: 20, fontWeight: 'bold' }
-});
