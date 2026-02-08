@@ -44,7 +44,7 @@ describe("GET /profile", () => {
         });
     });
 
-    it("should return user profile for authenticated user", async () => {
+    it("should return user profile with categories for authenticated user", async () => {
         const mockUser = {
             id: 1,
             user_name: "hi",
@@ -99,6 +99,95 @@ describe("GET /profile", () => {
                 ],
             },
         });
+
+        // Verify categories query was called with correct SQL and userId
+        expect(pool.query).toHaveBeenCalledTimes(2);
+        expect(pool.query).toHaveBeenNthCalledWith(2, expect.stringContaining("FROM categories c"), [1]);
+        expect(pool.query).toHaveBeenNthCalledWith(2, expect.stringContaining("INNER JOIN user_categories uc"), [1]);
+    });
+
+    it("should return user profile with empty categories array when user has no categories", async () => {
+        const mockUser = {
+            id: 1,
+            user_name: "hi",
+            current_location: null,
+            bio: null,
+            created_at: new Date("2024-01-01"),
+            updated_at: new Date("2024-01-15"),
+            last_login: new Date("2024-02-01"),
+        };
+
+        const token = jwt.sign({ userId: 1, email: "test@example.com" }, JWT_SECRET, { expiresIn: "1d" });
+
+        // Mock first query (user data)
+        vi.mocked(pool.query).mockResolvedValueOnce({
+            rows: [mockUser],
+            command: "",
+            rowCount: 1,
+            oid: 0,
+            fields: [],
+        } as any);
+
+        // Mock second query (no categories)
+        vi.mocked(pool.query).mockResolvedValueOnce({
+            rows: [],
+            command: "",
+            rowCount: 0,
+            oid: 0,
+            fields: [],
+        } as any);
+
+        const response = await request(app).get("/profile").set("Authorization", `Bearer ${token}`);
+
+        expect(response.status).toBe(200);
+        expect(response.body.user.categories).toEqual([]);
+    });
+
+    it("should return categories sorted by name", async () => {
+        const mockUser = {
+            id: 1,
+            user_name: "hi",
+            current_location: null,
+            bio: null,
+            created_at: new Date("2024-01-01"),
+            updated_at: new Date("2024-01-15"),
+            last_login: new Date("2024-02-01"),
+        };
+
+        const mockCategories = [
+            { id: 3, name: "basketball" },
+            { id: 1, name: "cycling" },
+            { id: 5, name: "programming" },
+            { id: 2, name: "yoga" },
+        ];
+
+        const token = jwt.sign({ userId: 1, email: "test@example.com" }, JWT_SECRET, { expiresIn: "1d" });
+
+        // Mock first query (user data)
+        vi.mocked(pool.query).mockResolvedValueOnce({
+            rows: [mockUser],
+            command: "",
+            rowCount: 1,
+            oid: 0,
+            fields: [],
+        } as any);
+
+        // Mock second query (categories already sorted from DB)
+        vi.mocked(pool.query).mockResolvedValueOnce({
+            rows: mockCategories,
+            command: "",
+            rowCount: 4,
+            oid: 0,
+            fields: [],
+        } as any);
+
+        const response = await request(app).get("/profile").set("Authorization", `Bearer ${token}`);
+
+        expect(response.status).toBe(200);
+        expect(response.body.user.categories).toEqual(mockCategories);
+
+        // Verify ORDER BY clause is in the query
+        expect(pool.query).toHaveBeenNthCalledWith(2, expect.stringContaining("ORDER BY c.name"), [1]);
     });
 
     it("should return 404 if user is not found in database", async () => {
@@ -119,6 +208,9 @@ describe("GET /profile", () => {
             success: false,
             message: "User not found",
         });
+
+        // Should not attempt to fetch categories if user not found
+        expect(pool.query).toHaveBeenCalledTimes(1);
     });
 
     it("should query the correct user from the token", async () => {
@@ -154,13 +246,49 @@ describe("GET /profile", () => {
 
         await request(app).get("/profile").set("Authorization", `Bearer ${token}`);
 
-        expect(pool.query).toHaveBeenCalledWith(expect.stringContaining("WHERE id = $1"), [42]);
+        // Verify both queries use the correct userId
+        expect(pool.query).toHaveBeenNthCalledWith(1, expect.stringContaining("WHERE id = $1"), [42]);
+        expect(pool.query).toHaveBeenNthCalledWith(2, expect.stringContaining("WHERE uc.user_id = $1"), [42]);
     });
 
     it("should return 500 on database error", async () => {
         const token = jwt.sign({ userId: 1, email: "test@example.com" }, JWT_SECRET, { expiresIn: "1d" });
 
         vi.mocked(pool.query).mockRejectedValue(new Error("Database error"));
+
+        const response = await request(app).get("/profile").set("Authorization", `Bearer ${token}`);
+
+        expect(response.status).toBe(500);
+        expect(response.body).toEqual({
+            success: false,
+            message: "Failed to fetch user profile",
+        });
+    });
+
+    it("should return 500 on categories query error", async () => {
+        const mockUser = {
+            id: 1,
+            user_name: "hi",
+            current_location: null,
+            bio: null,
+            created_at: new Date("2024-01-01"),
+            updated_at: new Date("2024-01-15"),
+            last_login: new Date("2024-02-01"),
+        };
+
+        const token = jwt.sign({ userId: 1, email: "test@example.com" }, JWT_SECRET, { expiresIn: "1d" });
+
+        // Mock first query succeeds (user data)
+        vi.mocked(pool.query).mockResolvedValueOnce({
+            rows: [mockUser],
+            command: "",
+            rowCount: 1,
+            oid: 0,
+            fields: [],
+        } as any);
+
+        // Mock second query fails (categories)
+        vi.mocked(pool.query).mockRejectedValueOnce(new Error("Categories database error"));
 
         const response = await request(app).get("/profile").set("Authorization", `Bearer ${token}`);
 
