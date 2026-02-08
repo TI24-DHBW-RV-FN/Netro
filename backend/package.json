@@ -8,7 +8,7 @@
     "type": "module",
     "keywords": [],
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit",
+        "test": "npx vitest",
         "start": "node dist/app.js",
         "dev": "npx tsx watch app.ts",
         "build": "npx tsc"
