@@ -2,23 +2,19 @@ import { Stack,Redirect } from "expo-router";
 import { useAuth } from "../../features/auth/authContext";
 import { createContext, useContext, useState } from 'react';
 
-export type Category = {
-    name: string;
-};
-
 type SignupContextType = {
     email: string;
     password: string;
     username: string;
     location: string;
     bio: string;
-    categories: Category[];
+    categories: string[];
     updateEmail: (email: string) => void;
     updatePassword: (password: string) => void;
     updateUsername: (username: string) => void;
     updateLocation: (location: string) => void;
     updateBio: (bio: string) => void;
-    updateCategories: (categories: Category[]) => void;
+    updateCategories: (categories: string[]) => void;
 };
 
 const SignupContext = createContext<SignupContextType | null>(null);
@@ -40,7 +36,7 @@ export default function AuthLayout() {
     const [username, setUsername] = useState<string>("");
     const [location, setLocation] = useState<string>("");
     const [bio, setBio] = useState<string>("");
-    const [categories, setCategories] = useState<Category[]>([]);
+    const [categories, setCategories] = useState<string[]>([]);
 
     const { isAuthenticated, isLoading } = useAuth();
 

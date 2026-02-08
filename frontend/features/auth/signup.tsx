@@ -7,10 +7,6 @@ function isValidEmail(email: string) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-function extractNames(arr: any[]) {
-    return arr.map(item => item.name);
-}
-
 export function useSubmitSignup() {
     const { email, password, username, location, bio, categories} = useSignup();
 
@@ -35,7 +31,7 @@ export function useSubmitSignup() {
                     userName: username,
                     currentLocation: location,
                     bio: bio,
-                    categories: extractNames(categories),
+                    categories: categories,
                 })
 
         } catch ( err: unknown) {

@@ -82,7 +82,7 @@ export default function SignupCategoriesScreen() {
 
     const handleContinue = () => {
         // store into global signup state
-        updateCategories(selected.map((name) => ({ name })));
+        updateCategories(selected);
 
         // go to next signup step
         router.push("/(auth)/signup-confirm"); // change to your route

@@ -1,5 +1,4 @@
 import {env} from "../../config/env";
-import {Category} from "../../app/(auth)/_layout"
 
 type LoginRequest = {
     email: string;
@@ -12,7 +11,7 @@ type SignupRequest = {
     userName: string;
     currentLocation: string;
     bio: string;
-    categories:Category[];
+    categories:string[];
 };
 
 type LoginResponse = {
