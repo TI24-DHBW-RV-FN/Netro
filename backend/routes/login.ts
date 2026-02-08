@@ -1,7 +1,7 @@
 import { Router, Request, Response } from "express";
 import { pool } from "../db.js";
 import { comparePassword } from "../hash/comparePassword.js";
-import { generateToken } from "../auth/generateToken.js";
+import { generateToken } from "../token/generateToken.js";
 
 const router = Router();
 

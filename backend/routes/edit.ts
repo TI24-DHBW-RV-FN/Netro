@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 import { pool } from "../db.js";
-import { authenticateToken } from "../auth/authenticateToken.js";
+import { authenticateToken } from "../token/authenticateToken.js";
 import { hashPassword } from "../hash/hashPassword.js";
 import bcrypt from "bcrypt";
 import { validateProfileUpdate } from "../helpers/validateProfileUpdate.js";

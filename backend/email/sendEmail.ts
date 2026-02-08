@@ -1,8 +1,7 @@
-import { transporter } from "./authenticateEmailConfig.js";
-import { verificationEmailData } from "./authenticateEmailTypes.js";
+import { transporter } from "./transporter.js";
+import { verificationEmailData } from "./emailTypes.js";
 
-//eMail
-export const sendVerificationEmail = async (data: verificationEmailData): Promise<void> => {
+export async function sendEmail(data: verificationEmailData): Promise<void> {
     const mailOptions = {
         from: `"${process.env.APP_NAME}" <${process.env.OFFICE365_EMAIL}>`,
         to: data.userEmail,
@@ -22,7 +21,7 @@ export const sendVerificationEmail = async (data: verificationEmailData): Promis
                     <div class="codeBox">${data.verificationCode}</div>
             </body>
             </html>
-        `
+        `,
     };
     try {
         const info = await transporter.sendMail(mailOptions);
@@ -31,4 +30,4 @@ export const sendVerificationEmail = async (data: verificationEmailData): Promis
         console.error("Error: Sending Verification:", error);
         throw new Error("Failed to send verification email");
     }
-};
+}

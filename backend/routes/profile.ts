@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 import { pool } from "../db.js";
-import { authenticateToken } from "../auth/authenticateToken.js";
+import { authenticateToken } from "../token/authenticateToken.js";
 
 const router = Router();
 

@@ -3,13 +3,14 @@ import request from "supertest";
 import express from "express";
 import registerRouter from "./register.js";
 import * as hashPasswordModule from "../hash/hashPassword.js";
-import * as generateTokenModule from "../auth/generateToken.js";
+import * as generateTokenModule from "../token/generateToken.js";
 import * as validateRegistrationModule from "../helpers/validateRegistrationInput.js";
 import { pool } from "../db.js";
 
 vi.mock("../hash/hashPassword");
-vi.mock("../auth/generateToken");
+vi.mock("../token/generateToken");
 vi.mock("../helpers/validateRegistrationInput");
+vi.mock("../email/sendVerificationEmail");
 vi.mock("../db", () => ({
     pool: {
         connect: vi.fn(),

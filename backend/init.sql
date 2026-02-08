@@ -14,7 +14,10 @@ CREATE TABLE IF NOT EXISTS users (
     bio VARCHAR(100),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    last_login TIMESTAMP
+    last_login TIMESTAMP,
+    email_verified BOOLEAN DEFAULT false,
+    verification_token VARCHAR(255),
+    verification_token_expires TIMESTAMP
 );
 -- Index for faster email lookups
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
