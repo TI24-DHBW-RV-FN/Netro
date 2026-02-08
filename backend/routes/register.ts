@@ -2,7 +2,7 @@ import { Router, Request, Response } from "express";
 import { pool } from "../db.js";
 import { hashPassword } from "../hash/hashPassword.js";
 import { generateToken } from "../auth/generateToken.js";
-import { validateAllUserInput } from "../helpers/validateAllUserInput.js";
+import { validateRegistrationInput } from "../helpers/validateRegistrationInput.js";
 
 const router = Router();
 
@@ -10,7 +10,7 @@ router.post("/", async (req: Request, res: Response) => {
     const client = await pool.connect();
 
     try {
-        const validation = validateAllUserInput(req.body);
+        const validation = validateRegistrationInput(req.body);
         if (!validation.valid) {
             return res.status(400).json({
                 success: false,
@@ -20,6 +20,12 @@ router.post("/", async (req: Request, res: Response) => {
         }
 
         const { email, password, userName, currentLocation, bio, categories } = req.body;
+
+        // verify email
+        // verify email
+        // verify email
+        // verify email
+        // verify email
 
         await client.query("BEGIN");
 

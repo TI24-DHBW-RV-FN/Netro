@@ -28,7 +28,8 @@
       "favicon": "./assets/netro-icon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-secure-store"
     ]
   }
 }
