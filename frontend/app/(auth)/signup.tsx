@@ -4,7 +4,7 @@ import {router} from "expo-router";
 import { useSignup } from "./_layout";
 
 
-export default function signupScreen() {
+export default function SignupScreen() {
     const { email, updateEmail } = useSignup();
 
     return (
@@ -15,7 +15,7 @@ export default function signupScreen() {
 
             <Text style={authStyles.title}>Sign Up</Text>
             <Text style={authStyles.subtitle}>Welcome!</Text>
-            <Text style={authStyles.subtitle}>Please enter you e-mail address:</Text>
+            <Text style={authStyles.subtitle}>Please enter your e-mail address:</Text>
 
             <TextInput
                 style={authStyles.input}
