@@ -6,7 +6,7 @@ const router = Router();
 
 router.get("/", async (req: Request, res: Response) => {
     try {
-        const result = await pool.query("SELECT id, name, created_at FROM categories ORDER BY name ASC");
+        const result = await pool.query("SELECT id, name FROM categories ORDER BY name ASC");
 
         res.status(200).json({
             success: true,

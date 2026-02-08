@@ -25,9 +25,9 @@ describe("GET /categories", () => {
 
     it("should return all categories sorted by name", async () => {
         const mockCategories = [
-            { id: 1, name: "basketball", created_at: new Date("2024-01-01").toString() },
-            { id: 2, name: "football", created_at: new Date("2024-01-02").toString() },
-            { id: 3, name: "programming", created_at: new Date("2024-01-03").toString() },
+            { id: 1, name: "basketball" },
+            { id: 2, name: "football" },
+            { id: 3, name: "programming" },
         ];
 
         vi.mocked(pool.query).mockResolvedValueOnce({
@@ -76,7 +76,7 @@ describe("GET /categories", () => {
 
         await request(app).get("/categories");
 
-        expect(pool.query).toHaveBeenCalledWith("SELECT id, name, created_at FROM categories ORDER BY name ASC");
+        expect(pool.query).toHaveBeenCalledWith("SELECT id, name FROM categories ORDER BY name ASC");
     });
 
     it("should return 500 on database error", async () => {

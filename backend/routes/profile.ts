@@ -9,7 +9,7 @@ router.get("/", authenticateToken, async (req: Request, res: Response) => {
         const userId = (req as any).user.userId;
 
         const result = await pool.query(
-            `SELECT id, email, user_name, current_location, bio, created_at, last_login 
+            `SELECT id, user_name, current_location, bio, created_at, updated_at, last_login 
              FROM users 
              WHERE id = $1`,
             [userId],
@@ -24,16 +24,30 @@ router.get("/", authenticateToken, async (req: Request, res: Response) => {
 
         const user = result.rows[0];
 
+        // Fetch user's categories
+        const categoriesResult = await pool.query(
+            `SELECT c.id, c.name
+             FROM categories c
+             INNER JOIN user_categories uc ON c.id = uc.category_id
+             WHERE uc.user_id = $1
+             ORDER BY c.name`,
+            [userId],
+        );
+
         res.json({
             success: true,
             user: {
                 id: user.id,
-                email: user.email,
                 userName: user.user_name,
                 currentLocation: user.current_location,
                 bio: user.bio,
                 createdAt: user.created_at,
+                updatedAt: user.updated_at,
                 lastLogin: user.last_login,
+                categories: categoriesResult.rows.map((cat) => ({
+                    id: cat.id,
+                    name: cat.name,
+                })),
             },
         });
     } catch (error) {
