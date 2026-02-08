@@ -62,7 +62,7 @@ export async function signupApi(
 
     if (!response.ok) {
         const data = await response.json().catch(() => null);
-        throw new Error(data?.message || "Login failed");
+        throw new Error(data?.message || "Registration failed");
     }
 
     return response.json();
