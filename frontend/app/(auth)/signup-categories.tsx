@@ -85,7 +85,7 @@ export default function SignupCategoriesScreen() {
         updateCategories(selected);
 
         // go to next signup step
-        router.replace("/");
+        router.push("/(auth)/signup-confirm"); // change to your route
     };
 
     if (loading) {
