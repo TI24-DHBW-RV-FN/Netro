@@ -12,15 +12,18 @@ export const authStyles = StyleSheet.create({
         fontSize: 36,
         fontWeight: "bold",
         color: "#ad98f5",
+        textAlign: "center",
     },
     subtitle: {
-        fontSize: 18,
+        fontSize: 24,
         color: "#666",
         marginBottom: 30,
+        textAlign: "center",
     },
     text: {
         fontSize: 18,
-        color: "white",
+        color: "#666",
+        textAlign: "center",
     },
     button: {
         backgroundColor: "#ad98f5",
@@ -48,5 +51,36 @@ export const authStyles = StyleSheet.create({
         borderRadius: 10,
         marginVertical: 10,
         width: "80%",
+    },
+// categories styles
+    list: {
+        paddingVertical: 8,
+    },
+    chip: {
+        paddingHorizontal: 14,
+        paddingVertical: 8,
+        borderRadius: 20,
+        borderWidth: 1,
+        margin: 6,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    chipSelected: {
+        backgroundColor: '#111',
+        borderColor: '#111',
+    },
+    chipUnselected: {
+        backgroundColor: '#fff',
+        borderColor: '#ccc',
+    },
+    chipText: {
+        fontSize: 14,
+        textTransform: 'capitalize',
+    },
+    chipTextSelected: {
+        color: '#fff',
+    },
+    chipTextUnselected: {
+        color: '#111',
     },
 });

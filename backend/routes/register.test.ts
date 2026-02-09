@@ -3,13 +3,14 @@ import request from "supertest";
 import express from "express";
 import registerRouter from "./register.js";
 import * as hashPasswordModule from "../hash/hashPassword.js";
-import * as generateTokenModule from "../auth/generateToken.js";
-import * as validateRegistrationModule from "../helpers/validateAllUserInput.js";
+import * as generateTokenModule from "../token/generateToken.js";
+import * as validateRegistrationModule from "../helpers/validateRegistrationInput.js";
 import { pool } from "../db.js";
 
 vi.mock("../hash/hashPassword");
-vi.mock("../auth/generateToken");
-vi.mock("../helpers/validateAllUserInput");
+vi.mock("../token/generateToken");
+vi.mock("../helpers/validateRegistrationInput");
+vi.mock("../email/sendVerificationEmail");
 vi.mock("../db", () => ({
     pool: {
         connect: vi.fn(),
@@ -36,7 +37,7 @@ describe("POST /register", () => {
     });
 
     it("should return 400 if validation fails", async () => {
-        vi.mocked(validateRegistrationModule.validateAllUserInput).mockReturnValue({
+        vi.mocked(validateRegistrationModule.validateRegistrationInput).mockReturnValue({
             valid: false,
             errors: ["Email is required and must be a string", "Password must be at least 8 characters long"],
         });
@@ -54,7 +55,7 @@ describe("POST /register", () => {
     });
 
     it("should return 409 if user already exists", async () => {
-        vi.mocked(validateRegistrationModule.validateAllUserInput).mockReturnValue({
+        vi.mocked(validateRegistrationModule.validateRegistrationInput).mockReturnValue({
             valid: true,
             errors: [],
         });
@@ -93,7 +94,7 @@ describe("POST /register", () => {
             created_at: new Date("2024-01-01").toString(),
         };
 
-        vi.mocked(validateRegistrationModule.validateAllUserInput).mockReturnValue({
+        vi.mocked(validateRegistrationModule.validateRegistrationInput).mockReturnValue({
             valid: true,
             errors: [],
         });
@@ -152,7 +153,7 @@ describe("POST /register", () => {
             { id: 2, name: "programming" },
         ];
 
-        vi.mocked(validateRegistrationModule.validateAllUserInput).mockReturnValue({
+        vi.mocked(validateRegistrationModule.validateRegistrationInput).mockReturnValue({
             valid: true,
             errors: [],
         });
@@ -213,7 +214,7 @@ describe("POST /register", () => {
             { id: 2, name: "programming" },
         ];
 
-        vi.mocked(validateRegistrationModule.validateAllUserInput).mockReturnValue({
+        vi.mocked(validateRegistrationModule.validateRegistrationInput).mockReturnValue({
             valid: true,
             errors: [],
         });
@@ -249,7 +250,7 @@ describe("POST /register", () => {
         const password = "mySecurePassword";
         const hashedPassword = "hashed_password";
 
-        vi.mocked(validateRegistrationModule.validateAllUserInput).mockReturnValue({
+        vi.mocked(validateRegistrationModule.validateRegistrationInput).mockReturnValue({
             valid: true,
             errors: [],
         });
@@ -292,7 +293,7 @@ describe("POST /register", () => {
     });
 
     it("should rollback transaction on database error", async () => {
-        vi.mocked(validateRegistrationModule.validateAllUserInput).mockReturnValue({
+        vi.mocked(validateRegistrationModule.validateRegistrationInput).mockReturnValue({
             valid: true,
             errors: [],
         });
@@ -326,7 +327,7 @@ describe("POST /register", () => {
             created_at: new Date("2024-01-01").toString(),
         };
 
-        vi.mocked(validateRegistrationModule.validateAllUserInput).mockReturnValue({
+        vi.mocked(validateRegistrationModule.validateRegistrationInput).mockReturnValue({
             valid: true,
             errors: [],
         });

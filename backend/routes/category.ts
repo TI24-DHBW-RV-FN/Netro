@@ -1,12 +1,12 @@
 import { Router, Request, Response } from "express";
-import { authenticateToken } from "../auth/authenticateToken.js";
+import { authenticateToken } from "../token/authenticateToken.js";
 import { pool } from "../db.js";
 
 const router = Router();
 
 router.get("/", async (req: Request, res: Response) => {
     try {
-        const result = await pool.query("SELECT id, name, created_at FROM categories ORDER BY name ASC");
+        const result = await pool.query("SELECT id, name FROM categories ORDER BY name ASC");
 
         res.status(200).json({
             success: true,

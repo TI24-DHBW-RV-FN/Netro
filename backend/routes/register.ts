@@ -1,8 +1,9 @@
 import { Router, Request, Response } from "express";
 import { pool } from "../db.js";
 import { hashPassword } from "../hash/hashPassword.js";
-import { generateToken } from "../auth/generateToken.js";
-import { validateAllUserInput } from "../helpers/validateAllUserInput.js";
+import { generateToken } from "../token/generateToken.js";
+import { validateRegistrationInput } from "../helpers/validateRegistrationInput.js";
+import { sendVerificationEmail } from "../email/sendVerificationEmail.js";
 
 const router = Router();
 
@@ -10,7 +11,7 @@ router.post("/", async (req: Request, res: Response) => {
     const client = await pool.connect();
 
     try {
-        const validation = validateAllUserInput(req.body);
+        const validation = validateRegistrationInput(req.body);
         if (!validation.valid) {
             return res.status(400).json({
                 success: false,
@@ -20,6 +21,12 @@ router.post("/", async (req: Request, res: Response) => {
         }
 
         const { email, password, userName, currentLocation, bio, categories } = req.body;
+
+        // verify email
+        // verify email
+        // verify email
+        // verify email
+        // verify email
 
         await client.query("BEGIN");
 
@@ -34,12 +41,13 @@ router.post("/", async (req: Request, res: Response) => {
         }
 
         const passwordHash = await hashPassword(password);
-
+        const verificationToken = await sendVerificationEmail(email);
+        const tokenExpires = new Date(Date.now() + 5 * 60 * 1000);
         const result = await client.query(
-            `INSERT INTO users (email, password_hash, user_name, current_location, bio) 
-             VALUES ($1, $2, $3, $4, $5) 
-             RETURNING id, email, user_name, current_location, bio, created_at`,
-            [email, passwordHash, userName || null, currentLocation || null, bio || null],
+            `INSERT INTO users (email, password_hash, user_name, current_location, bio, email_verified, verification_token, verification_token_expires) 
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
+            RETURNING id, email, user_name, current_location, bio, created_at`,
+            [email, passwordHash, userName || null, currentLocation || null, bio || null, false, verificationToken, tokenExpires],
         );
 
         const newUser = result.rows[0];
