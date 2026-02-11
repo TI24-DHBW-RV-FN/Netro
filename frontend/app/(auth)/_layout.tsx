@@ -43,7 +43,7 @@ export default function AuthLayout() {
     if (isLoading) return null;
 
     if (isAuthenticated) {
-        return <Redirect href="/(tabs)/home" />;      //ToDo: Comment in, as soon as landingpage exists
+        return <Redirect href="/(tabs)/home" />;
     }
 
     return (
