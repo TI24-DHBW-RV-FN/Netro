@@ -10,9 +10,9 @@ export default function ProfileScreen() {
 
     const handleLogout = async () => {
         try {
-            // Task: "Entfernen des Login Tokens"
+            // Task: "Removal of Login Tokens"
             await signOut();
-            // Task: "Redirect zu Login/Register"
+            // Task: "Redirect to Login/Register"
             router.replace('/login');
         } catch (error) {
             console.error("Failed to sign out:", error);
@@ -21,7 +21,7 @@ export default function ProfileScreen() {
 
     return (
         <SafeAreaView style={homeStyles.container}>
-            {/* Header im gleichen Stil wie auf der Home-Seite */}
+            {}
             <View style={homeStyles.header}>
                 <Text style={homeStyles.headerTitle}>Profile</Text>
             </View>
