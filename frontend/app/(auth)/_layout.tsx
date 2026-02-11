@@ -42,9 +42,9 @@ export default function AuthLayout() {
 
     if (isLoading) return null;
 
-    //if (isAuthenticated) {
-    //    return <Redirect href="/(tabs)/home" />;      //ToDo: Comment in, as soon as landingpage exists
-    //}
+    if (isAuthenticated) {
+        return <Redirect href="/(tabs)/home" />;
+    }
 
     return (
         <SignupContext.Provider
