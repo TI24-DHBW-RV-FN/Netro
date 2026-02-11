@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import request from "supertest";
 import express from "express";
-import loginRouter from "./login";
-import * as comparePasswordModule from "../hash/comparePassword";
-import * as generateTokenModule from "../token/generateToken";
-import { pool } from "../db";
+import loginRouter from "./login.js";
+import * as comparePasswordModule from "../hash/comparePassword.js";
+import * as generateTokenModule from "../token/generateToken.js";
+import { pool } from "../db.js";
 
 vi.mock("../hash/comparePassword");
 vi.mock("../token/generateToken");
@@ -55,7 +55,7 @@ describe("POST /login", () => {
             oid: 0,
             fields: [],
             rowCount: 0,
-        });
+        } as any);
 
         const response = await request(app).post("/login").send({
             email: "nonexistent@example.com",
@@ -76,7 +76,7 @@ describe("POST /login", () => {
             oid: 0,
             fields: [],
             rowCount: 1,
-        });
+        } as any);
 
         vi.mocked(comparePasswordModule.comparePassword).mockResolvedValue(false);
 
@@ -109,7 +109,7 @@ describe("POST /login", () => {
                 oid: 0,
                 fields: [],
                 rowCount: 1,
-            })
+            } as any)
             // Mock last_login update
             .mockResolvedValueOnce({
                 rows: [],
@@ -117,7 +117,7 @@ describe("POST /login", () => {
                 oid: 0,
                 fields: [],
                 rowCount: 1,
-            })
+            } as any)
             // Mock categories query
             .mockResolvedValueOnce({
                 rows: [{ name: "Technology" }, { name: "Science" }],
@@ -125,10 +125,9 @@ describe("POST /login", () => {
                 oid: 0,
                 fields: [],
                 rowCount: 2,
-            });
+            } as any);
 
         vi.mocked(comparePasswordModule.comparePassword).mockResolvedValue(true);
-        // Use mockImplementation for synchronous function
         vi.mocked(generateTokenModule.generateToken).mockImplementation(() => token);
 
         const response = await request(app).post("/login").send({
@@ -164,21 +163,21 @@ describe("POST /login", () => {
                 oid: 0,
                 fields: [],
                 rowCount: 1,
-            })
+            } as any)
             .mockResolvedValueOnce({
                 rows: [],
                 command: "",
                 oid: 0,
                 fields: [],
                 rowCount: 1,
-            })
+            } as any)
             .mockResolvedValueOnce({
                 rows: [],
                 command: "",
                 oid: 0,
                 fields: [],
                 rowCount: 0,
-            });
+            } as any);
 
         vi.mocked(comparePasswordModule.comparePassword).mockResolvedValue(true);
         vi.mocked(generateTokenModule.generateToken).mockImplementation(() => "token");
@@ -207,21 +206,21 @@ describe("POST /login", () => {
                 oid: 0,
                 fields: [],
                 rowCount: 1,
-            })
+            } as any)
             .mockResolvedValueOnce({
                 rows: [],
                 command: "",
                 oid: 0,
                 fields: [],
                 rowCount: 1,
-            })
+            } as any)
             .mockResolvedValueOnce({
                 rows: [],
                 command: "",
                 oid: 0,
                 fields: [],
                 rowCount: 0,
-            });
+            } as any);
 
         vi.mocked(comparePasswordModule.comparePassword).mockResolvedValue(true);
         vi.mocked(generateTokenModule.generateToken).mockImplementation(() => token);
