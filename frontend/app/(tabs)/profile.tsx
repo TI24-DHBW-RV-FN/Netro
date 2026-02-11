@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { homeStyles, themeColors } from "../../constants/styles";
 import { authStyles } from "../(auth)/styles";
@@ -10,8 +10,10 @@ export default function ProfileScreen() {
 
     const handleLogout = async () => {
         try {
+            // Task: "Removal of Login Tokens"
             await signOut();
-            router.replace('/'); // navigate back to the home screen after logout
+            // Task: "Redirect to Login/Register"
+            router.replace('/login');
         } catch (error) {
             console.error("Failed to sign out:", error);
         }
@@ -19,25 +21,22 @@ export default function ProfileScreen() {
 
     return (
         <SafeAreaView style={homeStyles.container}>
-            {/* Header im gleichen Stil wie auf der Home-Seite */}
+            {}
             <View style={homeStyles.header}>
                 <Text style={homeStyles.headerTitle}>Profile</Text>
             </View>
 
-            <View style={styles.content}>
+            {/* Using homeStyles.content because it is already defined in your styles.ts */}
+            <View style={homeStyles.content}>
                 <TouchableOpacity style={authStyles.button} onPress={handleLogout}>
-                    <Text style={authStyles.buttonText}>Log Out</Text>
+                    {/* Task: Button must say "Ausloggen" */}
+                    <Text style={authStyles.buttonText}>Ausloggen</Text>
                 </TouchableOpacity>
-                <Text style={{ color: themeColors.text }}>Welcome to your profile!</Text>
+
+                <Text style={{ color: themeColors.text, marginTop: 20 }}>
+                    Welcome to your profile!
+                </Text>
             </View>
         </SafeAreaView>
     );
 }
-
-const styles = StyleSheet.create({
-    content: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center'
-    }
-});

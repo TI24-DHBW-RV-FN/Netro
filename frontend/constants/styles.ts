@@ -84,5 +84,10 @@ export const homeStyles = StyleSheet.create({
         color: themeColors.secondary, //
         fontSize: 14,
         fontWeight: '500',
-    }
+    },
+    content: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
 });
