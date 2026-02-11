@@ -9,8 +9,12 @@ export default function ProfileScreen() {
     const { signOut } = useAuth();
 
     const handleLogout = async () => {
-        await signOut();
-        router.replace('/'); // navigate back to the home screen after logout
+        try {
+            await signOut();
+            router.replace('/'); // navigate back to the home screen after logout
+        } catch (error) {
+            console.error("Failed to sign out:", error);
+        }
     }
 
     return (
