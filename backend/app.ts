@@ -6,12 +6,18 @@ import profileRouter from "./routes/profile.js";
 import editRouter from "./routes/edit.js";
 import categoryRouter from "./routes/category.js";
 import verifyRouter from "./routes/verify.js";
+// import eventRouter from "./routes/event.js";
 import { pool } from "./db.js";
+import swaggerUi from "swagger-ui-express";
+import YAML from "yamljs";
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+const swaggerDocument = YAML.load("./APIDocumentation.yaml");
+app.use("/documentation", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use(express.json());
 
@@ -41,10 +47,12 @@ app.use("/profile", profileRouter);
 app.use("/edit", editRouter);
 app.use("/category", categoryRouter);
 app.use("/verify", verifyRouter);
+// app.use("/event", eventRouter);
 
 app.listen(PORT, () => {
     console.log(`🚀 Server is running on http://localhost:${PORT}`);
     console.log(`📊 Health check: http://localhost:${PORT}/health`);
+    console.log(`📝 API Documentation http://localhost:${PORT}/documentation`);
 });
 
 export default app;
