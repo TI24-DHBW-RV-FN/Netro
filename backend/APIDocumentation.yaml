@@ -1,0 +1,818 @@
+openapi: 3.0.0
+info:
+  title: Netro API
+  description: |
+    API for the Netro social platform. This API handles user authentication, profile management, 
+    categories, email verification, and events.
+    
+    ## Authentication
+    Most endpoints require JWT authentication. Include the token in the Authorization header:
+    ```
+    Authorization: Bearer <your_jwt_token>
+    ```
+  version: 1.0.0
+  contact:
+    name: Netro API Support
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+
+tags:
+  - name: Health
+    description: System health and status endpoints
+  - name: Authentication
+    description: User registration and login
+  - name: Profile
+    description: User profile management
+  - name: Categories
+    description: Category management
+  - name: Verification
+    description: Email verification
+  # - name: Events
+  #   description: Event management
+
+paths:
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Health check
+      description: Check the health status of the API and database connection
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: healthy
+                  database:
+                    type: string
+                    example: connected
+                  timestamp:
+                    type: string
+                    format: date-time
+                    example: '2024-02-11T10:30:00.000Z'
+        '503':
+          description: Service unavailable
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: unhealthy
+                  database:
+                    type: string
+                    example: disconnected
+
+  /register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user
+      description: Create a new user account with email, password, and username
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - userName
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: Valid email address
+                  example: user@example.com
+                password:
+                  type: string
+                  format: password
+                  minLength: 8
+                  description: Password with minimum 8 characters
+                  example: password123
+                userName:
+                  type: string
+                  maxLength: 100
+                  description: User's display name
+                  example: JohnDoe
+                currentLocation:
+                  type: string
+                  maxLength: 100
+                  description: User's current location
+                  example: New York, NY
+                bio:
+                  type: string
+                  maxLength: 100
+                  description: Short biography
+                  example: Software developer and basketball enthusiast
+                categories:
+                  type: array
+                  items:
+                    type: string
+                  description: Array of category names
+                  example: ["basketball", "programming", "reading"]
+      responses:
+        '201':
+          description: Registration successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Registration successful
+                  token:
+                    type: string
+                    description: JWT authentication token
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  user:
+                    $ref: '#/components/schemas/User'
+        '400':
+          description: Validation failed or invalid categories
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ValidationError'
+                  - $ref: '#/components/schemas/InvalidCategoriesError'
+                  - type: object
+                    properties:
+                      success:
+                        type: boolean
+                        example: false
+                      message:
+                        type: string
+                        example: Username is required
+        '409':
+          description: User already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: User with this email already exists
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: Registration failed
+
+  /login:
+    post:
+      tags:
+        - Authentication
+      summary: User login
+      description: Authenticate a user and receive a JWT token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: User's email address
+                  example: user@example.com
+                password:
+                  type: string
+                  format: password
+                  description: User's password
+                  example: password123
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Login successful
+                  token:
+                    type: string
+                    description: JWT authentication token
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  user:
+                    $ref: '#/components/schemas/User'
+        '400':
+          description: Missing fields or invalid email format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                missingFields:
+                  value:
+                    success: false
+                    message: Email and password are required
+                invalidEmail:
+                  value:
+                    success: false
+                    message: Invalid email format
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: Invalid email or password
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: Login failed
+
+  /profile:
+    get:
+      tags:
+        - Profile
+      summary: Get user profile
+      description: Retrieve the authenticated user's profile information
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  user:
+                    $ref: '#/components/schemas/UserProfile'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: User not found
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: Failed to fetch user profile
+
+  /edit/profile:
+    post:
+      tags:
+        - Profile
+      summary: Update user profile
+      description: Update user profile information including username, location, bio, and categories
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userName:
+                  type: string
+                  maxLength: 100
+                  description: User's display name
+                  example: JohnDoe_Updated
+                currentLocation:
+                  type: string
+                  maxLength: 100
+                  description: User's current location
+                  example: Los Angeles, CA
+                bio:
+                  type: string
+                  maxLength: 100
+                  description: Short biography
+                  example: Full-stack developer and sports fan
+                categories:
+                  type: array
+                  items:
+                    type: string
+                  description: Array of category names
+                  example: ["basketball", "football", "programming"]
+              minProperties: 1
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Profile updated successfully
+                  user:
+                    $ref: '#/components/schemas/User'
+        '400':
+          description: Validation failed or no fields provided
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ValidationError'
+                  - $ref: '#/components/schemas/InvalidCategoriesError'
+                  - $ref: '#/components/schemas/Error'
+              examples:
+                noFields:
+                  value:
+                    success: false
+                    message: At least one field must be provided to update
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: User not found
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: Failed to update profile
+
+  /edit/password:
+    post:
+      tags:
+        - Profile
+      summary: Change password
+      description: Change the authenticated user's password
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - oldPassword
+                - newPassword
+              properties:
+                oldPassword:
+                  type: string
+                  format: password
+                  description: Current password
+                  example: currentPassword123
+                newPassword:
+                  type: string
+                  format: password
+                  minLength: 8
+                  description: New password (minimum 8 characters)
+                  example: newPassword456
+      responses:
+        '200':
+          description: Password updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Password updated successfully
+        '400':
+          description: Missing fields or password too short
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                missingFields:
+                  value:
+                    success: false
+                    message: Old password and new password are required
+                tooShort:
+                  value:
+                    success: false
+                    message: New password must be at least 8 characters long
+        '401':
+          description: Current password is incorrect
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: Current password is incorrect
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: User not found
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: Failed to update password
+
+  /edit/email:
+    post:
+      tags:
+        - Profile
+      summary: Change email address
+      description: Change the authenticated user's email address
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - oldEmail
+                - newEmail
+              properties:
+                oldEmail:
+                  type: string
+                  format: email
+                  description: Current email address
+                  example: current@example.com
+                newEmail:
+                  type: string
+                  format: email
+                  description: New email address
+                  example: new@example.com
+      responses:
+        '200':
+          description: Email updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Email updated successfully
+        '400':
+          description: Missing fields
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: Old password and new password are required
+        '401':
+          description: Current email is incorrect
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: Current email is incorrect
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: User not found
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: Failed to update email
+
+  /category:
+    get:
+      tags:
+        - Categories
+      summary: Get all categories
+      description: Retrieve a list of all available categories
+      responses:
+        '200':
+          description: Categories retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  categories:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Category'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: Request failed
+
+  /verify/email:
+    post:
+      tags:
+        - Verification
+      summary: Verify email address
+      description: Verify user's email address using a verification token
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - verificationToken
+              properties:
+                verificationToken:
+                  type: string
+                  description: 6-digit verification code sent to email
+                  example: "123456"
+      responses:
+        '200':
+          description: Email verified successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Email verified successfully
+        '400':
+          description: Validation error or token issue
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                missingToken:
+                  value:
+                    success: false
+                    message: Verification token is required
+                alreadyVerified:
+                  value:
+                    success: false
+                    message: Email is already verified
+                noToken:
+                  value:
+                    success: false
+                    message: No verification token found. Please request a new one.
+                invalidToken:
+                  value:
+                    success: false
+                    message: Invalid verification token
+                expired:
+                  value:
+                    success: false
+                    message: Verification token has expired. Please request a new one.
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: User not found
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: Failed to verify email
+
+  /verify/code:
+    get:
+      tags:
+        - Verification
+      summary: Request new verification code
+      description: Request a new verification code to be sent to the user's email
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Verification code sent successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Verification code sent successfully. Please check your email.
+                  expiresIn:
+                    type: string
+                    example: 5 minutes
+        '400':
+          description: Email already verified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: Email is already verified
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: User not found
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: Failed to send verification code
+
+  # /event/create:
+  #   post:
+  #     tags:
+  #       - Events
+  #     summary: Create a new event
+  #     description: Create a new event (implementation in progress)
+  #     security:
+  #       - bearerAuth: []
+  #     responses:
+  #       '200':
+  #         description: Success (implementation pending)
+  #         content:
+  #           application/json:
+  #             schema:
+  #               type: object
+  #               properties:
+  #                 success:
+  #                   type: boolean
+  #                   example: true
+  #                 message:
+  #                   type: string
+  #                   example: success
+  #       '404':
+  #         description: User not found
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/Error'
+  #             example:
+  #               success: false
+  #               message: User not found
+  #       '500':
+  #         description: Server error
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: '#/components/schemas/Error'
+  #             example:
+  #               success: false
+  #               message: Failed to create Event
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token obtained from login or registration
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        userName:
+          type: string
+          example: JohnDoe
+        currentLocation:
+          type: string
+          nullable: true
+          example: New York, NY
+        bio:
+          type: string
+          nullable: true
+          example: Software developer and basketball enthusiast
+        categories:
+          type: array
+          items:
+            type: string
+          example: ["basketball", "programming", "reading"]
+        createdAt:
+          type: string
+          format: date-time
+          example: '2024-01-15T10:30:00.000Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2024-02-11T10:30:00.000Z'
+
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: basketball
+
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: An error occurred
+
+    
