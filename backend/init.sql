@@ -3,7 +3,7 @@
 -- The database is already created by Docker, so we don't need CREATE DATABASE
 SET timezone = 'UTC';
 -- --------------------------------------------------------
--- USERS TABLE
+-- USER TABLE
 -- --------------------------------------------------------
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
@@ -24,29 +24,54 @@ CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 -- --------------------------------------------------------
 -- CATEGORIES TABLE
 -- --------------------------------------------------------
-CREATE TABLE IF NOT EXISTS categories (
+CREATE TABLE IF NOT EXISTS category (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL UNIQUE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 -- Index for faster category name lookups
-CREATE INDEX IF NOT EXISTS idx_categories_name ON categories(name);
+CREATE INDEX IF NOT EXISTS idx_category_name ON category(name);
 -- --------------------------------------------------------
 -- USER_CATEGORIES (Many-to-Many Junction Table)
 -- --------------------------------------------------------
-CREATE TABLE IF NOT EXISTS user_categories (
-    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    category_id INTEGER NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
+CREATE TABLE IF NOT EXISTS users_categories (
+    users_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    category_id INTEGER NOT NULL REFERENCES category(id) ON DELETE CASCADE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (user_id, category_id)
+    PRIMARY KEY (users_id, category_id)
 );
 -- Indexes for faster lookups
-CREATE INDEX IF NOT EXISTS idx_user_categories_user_id ON user_categories(user_id);
-CREATE INDEX IF NOT EXISTS idx_user_categories_category_id ON user_categories(category_id);
+CREATE INDEX IF NOT EXISTS idx_users_categories_users_id ON users_categories(users_id);
+CREATE INDEX IF NOT EXISTS idx_users_categories_category_id ON users_categories(category_id);
+-- --------------------------------------------------------
+-- EVENT TABLE
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS events (
+    id SERIAL PRIMARY KEY,
+    title VARCHAR(100),
+    description VARCHAR(255),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    start_time TIMESTAMP NOT NULL,
+    location VARCHAR(100) NOT NULL,
+    series_event BOOLEAN DEFAULT false,
+    frequency VARCHAR(100)
+);
+-- Index for faster event lookups
+CREATE INDEX IF NOT EXISTS idx_events_title ON events(title);
+-- --------------------------------------------------------
+-- EVENT_CATEGORIES (Many - to - Many Junction Table)
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS events_categories (
+    events_id INTEGER NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+    category_id INTEGER NOT NULL REFERENCES category(id) ON DELETE CASCADE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (events_id, category_id)
+);
 -- --------------------------------------------------------
 -- SEED CATEGORIES (Only if table is empty)
 -- --------------------------------------------------------
-INSERT INTO categories (name)
+INSERT INTO category (name)
 SELECT *
 FROM (
         VALUES ('basketball'),
@@ -72,13 +97,13 @@ FROM (
     ) AS v(name)
 WHERE NOT EXISTS (
         SELECT 1
-        FROM categories
+        FROM category
         LIMIT 1
     );
 -- --------------------------------------------------------
 -- DATABASE ROLES & PERMISSIONS
 -- --------------------------------------------------------
--- Grant permissions to netro_app user (created by POSTGRES_USER env var)
+-- Grant permissions to netro_app users (created by POSTGRES_USER env var)
 DO $$ BEGIN IF EXISTS (
     SELECT 1
     FROM pg_roles
@@ -90,15 +115,25 @@ GRANT SELECT,
 GRANT SELECT,
     INSERT,
     UPDATE,
-    DELETE ON categories TO netro_app;
+    DELETE ON category TO netro_app;
 GRANT SELECT,
     INSERT,
     UPDATE,
-    DELETE ON user_categories TO netro_app;
+    DELETE ON users_categories TO netro_app;
+GRANT SELECT,
+    INSERT,
+    UPDATE,
+    DELETE ON events TO netro_app;
+GRANT SELECT,
+    INSERT,
+    UPDATE,
+    DELETE ON events_categories TO netro_app;
 GRANT USAGE,
     SELECT ON SEQUENCE users_id_seq TO netro_app;
 GRANT USAGE,
-    SELECT ON SEQUENCE categories_id_seq TO netro_app;
+    SELECT ON SEQUENCE category_id_seq TO netro_app;
+GRANT USAGE,
+    SELECT ON SEQUENCE events_id_seq TO netro_app;
 END IF;
 END $$;
 -- Admin role (optional - for migrations and maintenance)
