@@ -22,12 +22,6 @@ router.post("/", async (req: Request, res: Response) => {
 
         const { email, password, userName, currentLocation, bio, categories } = req.body;
 
-        // verify email
-        // verify email
-        // verify email
-        // verify email
-        // verify email
-
         await client.query("BEGIN");
 
         const userExists = await client.query("SELECT id FROM users WHERE email = $1", [email]);
