@@ -11,9 +11,13 @@ export const transporter: Transporter = nodemailer.createTransport({
         user: process.env.OFFICE365_EMAIL,
         pass: process.env.OFFICE365_PASSWORD,
     },
-    tls: {
-        rejectUnauthorized: false,
-    },
+    ...(process.env.NODE_ENV !== "production"
+        ? {
+              tls: {
+                  rejectUnauthorized: false,
+              },
+          }
+        : {}),
 });
 
 //test

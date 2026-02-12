@@ -49,10 +49,13 @@ app.use("/category", categoryRouter);
 app.use("/verify", verifyRouter);
 // app.use("/event", eventRouter);
 
-app.listen(PORT, () => {
-    console.log(`🚀 Server is running on http://localhost:${PORT}`);
-    console.log(`📊 Health check: http://localhost:${PORT}/health`);
-    console.log(`📝 API Documentation http://localhost:${PORT}/documentation`);
-});
+// Only start server if this file is run directly (not imported in tests)
+if (import.meta.main) {
+    app.listen(PORT, () => {
+        console.log(`🚀 Server is running on http://localhost:${PORT}`);
+        console.log(`📊 Health check: http://localhost:${PORT}/health`);
+        console.log(`📚 API Documentation http://localhost:${PORT}/documentation`);
+    });
+}
 
 export default app;

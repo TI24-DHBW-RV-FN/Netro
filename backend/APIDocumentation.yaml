@@ -10,6 +10,13 @@ info:
     ```
     Authorization: Bearer <your_jwt_token>
     ```
+    
+    ## Response Format
+    All responses follow a consistent format:
+    - **Success responses** include `success: true` and a `message` field
+    - **Error responses** include `success: false` and a descriptive `message` field
+    - Validation errors include an additional `errors` array
+    - Invalid category errors include an `invalidCategories` array
   version: 1.0.0
   contact:
     name: Netro API Support
@@ -28,8 +35,6 @@ tags:
     description: Category management
   - name: Verification
     description: Email verification
-  # - name: Events
-  #   description: Event management
 
 paths:
   /health:
@@ -125,20 +130,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: Registration successful
-                  token:
-                    type: string
-                    description: JWT authentication token
-                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-                  user:
-                    $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/RegistrationSuccessResponse'
         '400':
           description: Validation failed or invalid categories
           content:
@@ -147,14 +139,6 @@ paths:
                 oneOf:
                   - $ref: '#/components/schemas/ValidationError'
                   - $ref: '#/components/schemas/InvalidCategoriesError'
-                  - type: object
-                    properties:
-                      success:
-                        type: boolean
-                        example: false
-                      message:
-                        type: string
-                        example: Username is required
         '409':
           description: User already exists
           content:
@@ -206,20 +190,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: Login successful
-                  token:
-                    type: string
-                    description: JWT authentication token
-                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-                  user:
-                    $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/LoginSuccessResponse'
         '400':
           description: Missing fields or invalid email format
           content:
@@ -268,13 +239,22 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  user:
-                    $ref: '#/components/schemas/UserProfile'
+                $ref: '#/components/schemas/ProfileSuccessResponse'
+        '401':
+          description: Unauthorized - missing or invalid token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                noToken:
+                  value:
+                    success: false
+                    message: Access token is required
+                invalidToken:
+                  value:
+                    success: false
+                    message: Invalid or expired token
         '404':
           description: User not found
           content:
@@ -337,16 +317,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: Profile updated successfully
-                  user:
-                    $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/ProfileUpdateSuccessResponse'
         '400':
           description: Validation failed or no fields provided
           content:
@@ -361,6 +332,12 @@ paths:
                   value:
                     success: false
                     message: At least one field must be provided to update
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
           description: User not found
           content:
@@ -415,14 +392,10 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: Password updated successfully
+                $ref: '#/components/schemas/SuccessResponse'
+              example:
+                success: true
+                message: Password updated successfully
         '400':
           description: Missing fields or password too short
           content:
@@ -439,14 +412,20 @@ paths:
                     success: false
                     message: New password must be at least 8 characters long
         '401':
-          description: Current password is incorrect
+          description: Current password is incorrect or unauthorized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-              example:
-                success: false
-                message: Current password is incorrect
+              examples:
+                incorrectPassword:
+                  value:
+                    success: false
+                    message: Current password is incorrect
+                unauthorized:
+                  value:
+                    success: false
+                    message: Invalid or expired token
         '404':
           description: User not found
           content:
@@ -500,14 +479,10 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: Email updated successfully
+                $ref: '#/components/schemas/SuccessResponse'
+              example:
+                success: true
+                message: Email updated successfully
         '400':
           description: Missing fields
           content:
@@ -516,16 +491,22 @@ paths:
                 $ref: '#/components/schemas/Error'
               example:
                 success: false
-                message: Old password and new password are required
+                message: Old email and new email are required
         '401':
-          description: Current email is incorrect
+          description: Current email is incorrect or unauthorized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-              example:
-                success: false
-                message: Current email is incorrect
+              examples:
+                incorrectEmail:
+                  value:
+                    success: false
+                    message: Current email is incorrect
+                unauthorized:
+                  value:
+                    success: false
+                    message: Invalid or expired token
         '404':
           description: User not found
           content:
@@ -557,15 +538,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  categories:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Category'
+                $ref: '#/components/schemas/CategoriesSuccessResponse'
         '500':
           description: Server error
           content:
@@ -603,14 +576,10 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: Email verified successfully
+                $ref: '#/components/schemas/SuccessResponse'
+              example:
+                success: true
+                message: Email verified successfully
         '400':
           description: Validation error or token issue
           content:
@@ -638,6 +607,12 @@ paths:
                   value:
                     success: false
                     message: Verification token has expired. Please request a new one.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
           description: User not found
           content:
@@ -691,6 +666,12 @@ paths:
               example:
                 success: false
                 message: Email is already verified
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
           description: User not found
           content:
@@ -710,47 +691,6 @@ paths:
                 success: false
                 message: Failed to send verification code
 
-  # /event/create:
-  #   post:
-  #     tags:
-  #       - Events
-  #     summary: Create a new event
-  #     description: Create a new event (implementation in progress)
-  #     security:
-  #       - bearerAuth: []
-  #     responses:
-  #       '200':
-  #         description: Success (implementation pending)
-  #         content:
-  #           application/json:
-  #             schema:
-  #               type: object
-  #               properties:
-  #                 success:
-  #                   type: boolean
-  #                   example: true
-  #                 message:
-  #                   type: string
-  #                   example: success
-  #       '404':
-  #         description: User not found
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #             example:
-  #               success: false
-  #               message: User not found
-  #       '500':
-  #         description: Server error
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: '#/components/schemas/Error'
-  #             example:
-  #               success: false
-  #               message: Failed to create Event
-
 components:
   securitySchemes:
     bearerAuth:
@@ -760,6 +700,72 @@ components:
       description: JWT token obtained from login or registration
 
   schemas:
+    # Base response schemas
+    SuccessResponse:
+      type: object
+      required:
+        - success
+        - message
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: Operation successful
+
+    Error:
+      type: object
+      required:
+        - success
+        - message
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: An error occurred
+
+    ValidationError:
+      type: object
+      required:
+        - success
+        - message
+        - errors
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: Validation failed
+        errors:
+          type: array
+          items:
+            type: string
+          example: ["Email is required", "Password must be at least 8 characters"]
+
+    InvalidCategoriesError:
+      type: object
+      required:
+        - success
+        - message
+        - invalidCategories
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: Invalid categories provided
+        invalidCategories:
+          type: array
+          items:
+            type: string
+          example: ["invalid_category_1", "invalid_category_2"]
+
+    # User schemas
     User:
       type: object
       properties:
@@ -790,10 +796,42 @@ components:
           type: string
           format: date-time
           example: '2024-01-15T10:30:00.000Z'
+
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        userName:
+          type: string
+          nullable: true
+          example: JohnDoe
+        currentLocation:
+          type: string
+          nullable: true
+          example: New York, NY
+        bio:
+          type: string
+          nullable: true
+          example: Software developer and basketball enthusiast
+        createdAt:
+          type: string
+          format: date-time
+          example: '2024-01-15T10:30:00.000Z'
         updatedAt:
           type: string
           format: date-time
           example: '2024-02-11T10:30:00.000Z'
+        lastLogin:
+          type: string
+          format: date-time
+          nullable: true
+          example: '2024-02-12T08:30:00.000Z'
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/Category'
 
     Category:
       type: object
@@ -805,14 +843,105 @@ components:
           type: string
           example: basketball
 
-    Error:
-      type: object
-      properties:
-        success:
-          type: boolean
-          example: false
-        message:
-          type: string
-          example: An error occurred
+    # Success response schemas
+    RegistrationSuccessResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            token:
+              type: string
+              description: JWT authentication token
+              example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+            user:
+              $ref: '#/components/schemas/User'
 
-    
+    LoginSuccessResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            token:
+              type: string
+              description: JWT authentication token
+              example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+            user:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  example: 1
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                userName:
+                  type: string
+                  example: JohnDoe
+                currentLocation:
+                  type: string
+                  nullable: true
+                  example: New York, NY
+                bio:
+                  type: string
+                  nullable: true
+                  example: Software developer
+                categories:
+                  type: array
+                  items:
+                    type: string
+                  example: ["basketball", "programming"]
+
+    ProfileSuccessResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            user:
+              $ref: '#/components/schemas/UserProfile'
+
+    ProfileUpdateSuccessResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            user:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  example: 1
+                email:
+                  type: string
+                  format: email
+                  example: user@example.com
+                userName:
+                  type: string
+                  example: JohnDoe_Updated
+                currentLocation:
+                  type: string
+                  nullable: true
+                  example: Los Angeles, CA
+                bio:
+                  type: string
+                  nullable: true
+                  example: Full-stack developer
+                categories:
+                  type: array
+                  items:
+                    type: string
+                  example: ["basketball", "football", "programming"]
+                updatedAt:
+                  type: string
+                  format: date-time
+                  example: '2024-02-12T10:30:00.000Z'
+
+    CategoriesSuccessResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            categories:
+              type: array
+              items:
+                $ref: '#/components/schemas/Category'
