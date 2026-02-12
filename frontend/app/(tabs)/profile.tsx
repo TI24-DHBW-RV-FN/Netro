@@ -13,7 +13,7 @@ export default function ProfileScreen() {
             // Task: "Removal of Login Tokens"
             await signOut();
             // Task: "Redirect to Log in/Register"
-            router.replace('/login');
+            router.replace('/');
         } catch (error) {
             console.error("Failed to sign out:", error);
         }
