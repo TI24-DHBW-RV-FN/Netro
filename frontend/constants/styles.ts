@@ -40,7 +40,7 @@ export const homeStyles = StyleSheet.create({
         marginBottom: 20,
         borderWidth: 1,
         borderColor: themeColors.border,
-        shadowColor: themeColors.primary, // Glow-Effekt
+        shadowColor: themeColors.primary, // Glow-Effect
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.2,
         shadowRadius: 8,
