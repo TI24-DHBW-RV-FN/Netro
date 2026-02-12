@@ -213,11 +213,15 @@ router.post("/profile", authenticateToken, async (req: Request, res: Response) =
                 // Delete existing categories
                 await client.query("DELETE FROM user_categories WHERE user_id = $1", [userId]);
 
-                // Insert new categories
+                // Insert new categories using parameterized batch insert
                 const categoryIds = categoryCheck.rows.map((c: any) => c.id);
-                const insertValues = categoryIds.map((catId: any) => `(${userId}, ${catId})`).join(", ");
 
-                await client.query(`INSERT INTO user_categories (user_id, category_id) VALUES ${insertValues}`);
+                // Use unnest() for safe parameterized batch insert
+                await client.query(
+                    `INSERT INTO user_categories (user_id, category_id) 
+                     SELECT $1, unnest($2::int[])`,
+                    [userId, categoryIds],
+                );
             } else {
                 // If empty array, remove all categories
                 await client.query("DELETE FROM user_categories WHERE user_id = $1", [userId]);
