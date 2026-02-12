@@ -5,7 +5,7 @@ import { useLogin } from "../../features/auth/login"; // import your hook
 
 
 export default function LoginScreen() {
-    const { email, setEmail, password, setPassword, error, login, loading } = useLogin();
+    const { email, setEmail, password, setPassword, error, login } = useLogin();
 
     const handleLogin = async () => {
         const success = await login();

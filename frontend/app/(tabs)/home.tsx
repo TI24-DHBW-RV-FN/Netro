@@ -1,6 +1,6 @@
 import { View, Text, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { homeStyles, themeColors } from "../../constants/styles";
+import { homeStyles } from "../../constants/styles";
 
 export default function HomeLandingPage() {
     return (
