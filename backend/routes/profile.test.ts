@@ -4,7 +4,6 @@ import express from "express";
 import jwt from "jsonwebtoken";
 import profileRouter from "./profile.js";
 import { pool } from "../db.js";
-import { generateToken } from "../token/generateToken.js";
 
 vi.mock("../db", () => ({
     pool: {
