@@ -84,3 +84,5 @@ export const authStyles = StyleSheet.create({
         color: '#111',
     },
 });
+
+export default authStyles;
