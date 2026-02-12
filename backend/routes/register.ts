@@ -41,7 +41,7 @@ router.post("/", async (req: Request, res: Response) => {
             `INSERT INTO users (email, password_hash, user_name, current_location, bio, email_verified, verification_token, verification_token_expires) 
             VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
             RETURNING id, email, user_name, current_location, bio, created_at`,
-            [email, passwordHash, userName || null, currentLocation || null, bio || null, false, verificationToken, tokenExpires],
+            [email, passwordHash, userName, currentLocation || null, bio || null, false, verificationToken, tokenExpires],
         );
 
         const newUser = result.rows[0];
@@ -61,9 +61,12 @@ router.post("/", async (req: Request, res: Response) => {
             }
 
             const categoryIds = categoryCheck.rows.map((c) => c.id);
-            const insertValues = categoryIds.map((catId) => `(${newUser.id}, ${catId})`).join(", ");
 
-            await client.query(`INSERT INTO user_categories (user_id, category_id) VALUES ${insertValues}`);
+            await client.query(
+                `INSERT INTO user_categories (user_id, category_id) 
+                 SELECT $1, unnest($2::int[])`,
+                [newUser.id, categoryIds],
+            );
         }
 
         await client.query("COMMIT");
