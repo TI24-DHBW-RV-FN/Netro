@@ -4,6 +4,7 @@ import { authenticateToken } from "../token/authenticateToken.js";
 import { hashPassword } from "../hash/hashPassword.js";
 import bcrypt from "bcrypt";
 import { validateProfileUpdate } from "../helpers/validateProfileUpdate.js";
+import { ErrorMessages, SuccessMessages, sendError, sendSuccess } from "../helpers/ErrorMessages.js";
 
 const router = Router();
 
@@ -13,26 +14,17 @@ router.post("/password", authenticateToken, async (req: Request, res: Response) 
         const userId = (req as any).user.userId;
 
         if (!oldPassword || !newPassword) {
-            return res.status(400).json({
-                success: false,
-                message: "Old password and new password are required",
-            });
+            return sendError(res, 400, ErrorMessages.PASSWORD_REQUIRED);
         }
 
         if (newPassword.length < 8) {
-            return res.status(400).json({
-                success: false,
-                message: "New password must be at least 8 characters long",
-            });
+            return sendError(res, 400, ErrorMessages.PASSWORD_TOO_SHORT);
         }
 
         const userResult = await pool.query("SELECT password_hash FROM users WHERE id = $1", [userId]);
 
         if (userResult.rows.length === 0) {
-            return res.status(404).json({
-                success: false,
-                message: "User not found",
-            });
+            return sendError(res, 404, ErrorMessages.USER_NOT_FOUND);
         }
 
         const currentPasswordHash = userResult.rows[0].password_hash;
@@ -40,26 +32,17 @@ router.post("/password", authenticateToken, async (req: Request, res: Response) 
         const isPasswordValid = await bcrypt.compare(oldPassword, currentPasswordHash);
 
         if (!isPasswordValid) {
-            return res.status(401).json({
-                success: false,
-                message: "Current password is incorrect",
-            });
+            return sendError(res, 401, ErrorMessages.PASSWORD_INCORRECT);
         }
 
         const newPasswordHash = await hashPassword(newPassword);
 
         await pool.query("UPDATE users SET password_hash = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2", [newPasswordHash, userId]);
 
-        res.json({
-            success: true,
-            message: "Password updated successfully",
-        });
+        sendSuccess(res, 200, SuccessMessages.PASSWORD_UPDATED);
     } catch (error) {
         console.error("Password change error:", error);
-        res.status(500).json({
-            success: false,
-            message: "Failed to update password",
-        });
+        sendError(res, 500, ErrorMessages.PASSWORD_UPDATE_FAILED);
     }
 });
 
@@ -69,28 +52,19 @@ router.post("/email", authenticateToken, async (req: Request, res: Response) => 
         const userId = (req as any).user.userId;
 
         if (!oldEmail || !newEmail) {
-            return res.status(400).json({
-                success: false,
-                message: "Old password and new password are required",
-            });
+            return sendError(res, 400, ErrorMessages.EMAIL_REQUIRED);
         }
 
         const userResult = await pool.query("SELECT email FROM users WHERE id = $1", [userId]);
 
         if (userResult.rows.length === 0) {
-            return res.status(404).json({
-                success: false,
-                message: "User not found",
-            });
+            return sendError(res, 404, ErrorMessages.USER_NOT_FOUND);
         }
 
         const currentEmail = userResult.rows[0].email;
 
         if (oldEmail !== currentEmail) {
-            return res.status(401).json({
-                success: false,
-                message: "Current email is incorrect",
-            });
+            return sendError(res, 401, ErrorMessages.EMAIL_INCORRECT);
         }
 
         // verify new email
@@ -101,16 +75,10 @@ router.post("/email", authenticateToken, async (req: Request, res: Response) => 
 
         await pool.query("UPDATE users SET email = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2", [newEmail, userId]);
 
-        res.json({
-            success: true,
-            message: "Email updated successfully",
-        });
+        sendSuccess(res, 200, SuccessMessages.EMAIL_UPDATED);
     } catch (error) {
         console.error("Email change error:", error);
-        res.status(500).json({
-            success: false,
-            message: "Failed to update email",
-        });
+        sendError(res, 500, ErrorMessages.EMAIL_UPDATE_FAILED);
     }
 });
 
@@ -121,38 +89,24 @@ router.post("/profile", authenticateToken, async (req: Request, res: Response) =
         const userId = (req as any).user.userId;
         const { userName, currentLocation, bio, categories } = req.body;
 
-        // Validate input
         const validation = validateProfileUpdate(req.body);
         if (!validation.valid) {
-            return res.status(400).json({
-                success: false,
-                message: "Validation failed",
-                errors: validation.errors,
-            });
+            return sendError(res, 400, ErrorMessages.VALIDATION_FAILED, validation.errors);
         }
 
-        // Check if at least one field is provided
         if (userName === undefined && currentLocation === undefined && bio === undefined && categories === undefined) {
-            return res.status(400).json({
-                success: false,
-                message: "At least one field must be provided to update",
-            });
+            return sendError(res, 400, ErrorMessages.NO_FIELDS_PROVIDED);
         }
 
         await client.query("BEGIN");
 
-        // Check if user exists
         const userCheck = await client.query("SELECT id FROM users WHERE id = $1", [userId]);
 
         if (userCheck.rows.length === 0) {
             await client.query("ROLLBACK");
-            return res.status(404).json({
-                success: false,
-                message: "User not found",
-            });
+            return sendError(res, 404, ErrorMessages.USER_NOT_FOUND);
         }
 
-        // Build dynamic UPDATE query for user fields
         const updateFields: string[] = [];
         const updateValues: any[] = [];
         let paramCount = 1;
@@ -175,15 +129,10 @@ router.post("/profile", authenticateToken, async (req: Request, res: Response) =
             paramCount++;
         }
 
-        // Always update the updated_at timestamp
         updateFields.push(`updated_at = CURRENT_TIMESTAMP`);
-
-        // Add userId as the last parameter
         updateValues.push(userId);
 
-        // Update user table if there are fields to update
         if (updateFields.length > 1) {
-            // > 1 because updated_at is always included
             const updateQuery = `
                 UPDATE users 
                 SET ${updateFields.join(", ")} 
@@ -192,10 +141,8 @@ router.post("/profile", authenticateToken, async (req: Request, res: Response) =
 
             await client.query(updateQuery, updateValues);
         }
-        // $x this represents the indices of the Values that are in updateValues. updateValues last Value will always be the User Id
-        // Handle categories update
+
         if (categories !== undefined && Array.isArray(categories)) {
-            // Validate categories exist
             if (categories.length > 0) {
                 const categoryCheck = await client.query("SELECT id, name FROM categories WHERE name = ANY($1)", [categories]);
 
@@ -203,28 +150,23 @@ router.post("/profile", authenticateToken, async (req: Request, res: Response) =
                     await client.query("ROLLBACK");
                     const validCategories = categoryCheck.rows.map((c: any) => c.name);
                     const invalidCategories = categories.filter((categoryName: string) => !validCategories.includes(categoryName));
-                    return res.status(400).json({
-                        success: false,
-                        message: "Invalid categories provided",
-                        invalidCategories,
-                    });
+                    return sendError(res, 400, ErrorMessages.INVALID_CATEGORIES, undefined, invalidCategories);
                 }
 
-                // Delete existing categories
                 await client.query("DELETE FROM user_categories WHERE user_id = $1", [userId]);
 
-                // Insert new categories
                 const categoryIds = categoryCheck.rows.map((c: any) => c.id);
-                const insertValues = categoryIds.map((catId: any) => `(${userId}, ${catId})`).join(", ");
 
-                await client.query(`INSERT INTO user_categories (user_id, category_id) VALUES ${insertValues}`);
+                await client.query(
+                    `INSERT INTO user_categories (user_id, category_id) 
+                     SELECT $1, unnest($2::int[])`,
+                    [userId, categoryIds],
+                );
             } else {
-                // If empty array, remove all categories
                 await client.query("DELETE FROM user_categories WHERE user_id = $1", [userId]);
             }
         }
 
-        // Fetch updated user data with categories
         const userResult = await client.query(
             `SELECT u.id, u.email, u.user_name, u.current_location, u.bio, u.updated_at,
                     COALESCE(
@@ -243,9 +185,7 @@ router.post("/profile", authenticateToken, async (req: Request, res: Response) =
 
         const updatedUser = userResult.rows[0];
 
-        res.json({
-            success: true,
-            message: "Profile updated successfully",
+        sendSuccess(res, 200, SuccessMessages.PROFILE_UPDATED, {
             user: {
                 id: updatedUser.id,
                 email: updatedUser.email,
@@ -259,10 +199,7 @@ router.post("/profile", authenticateToken, async (req: Request, res: Response) =
     } catch (error) {
         await client.query("ROLLBACK");
         console.error("Profile update error:", error);
-        res.status(500).json({
-            success: false,
-            message: "Failed to update profile",
-        });
+        sendError(res, 500, ErrorMessages.PROFILE_UPDATE_FAILED);
     } finally {
         client.release();
     }

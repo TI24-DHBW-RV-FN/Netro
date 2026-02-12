@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import { pool } from "../db.js";
 import { authenticateToken } from "../token/authenticateToken.js";
+import { ErrorMessages, sendError, sendSuccess } from "../helpers/ErrorMessages.js";
 
 const router = Router();
 
@@ -16,15 +17,11 @@ router.get("/", authenticateToken, async (req: Request, res: Response) => {
         );
 
         if (result.rows.length === 0) {
-            return res.status(404).json({
-                success: false,
-                message: "User not found",
-            });
+            return sendError(res, 404, ErrorMessages.USER_NOT_FOUND);
         }
 
         const user = result.rows[0];
 
-        // Fetch user's categories
         const categoriesResult = await pool.query(
             `SELECT c.id, c.name
              FROM categories c
@@ -34,8 +31,7 @@ router.get("/", authenticateToken, async (req: Request, res: Response) => {
             [userId],
         );
 
-        res.json({
-            success: true,
+        sendSuccess(res, 200, "", {
             user: {
                 id: user.id,
                 userName: user.user_name,
@@ -52,10 +48,7 @@ router.get("/", authenticateToken, async (req: Request, res: Response) => {
         });
     } catch (error) {
         console.error("Profile error:", error);
-        res.status(500).json({
-            success: false,
-            message: "Failed to fetch user profile",
-        });
+        sendError(res, 500, ErrorMessages.PROFILE_FETCH_FAILED);
     }
 });
 

@@ -4,7 +4,6 @@ import express from "express";
 import jwt from "jsonwebtoken";
 import profileRouter from "./profile.js";
 import { pool } from "../db.js";
-import { generateToken } from "../token/generateToken.js";
 
 vi.mock("../db", () => ({
     pool: {
@@ -84,6 +83,7 @@ describe("GET /profile", () => {
 
         expect(response.status).toBe(200);
         expect(response.body).toEqual({
+            message: "",
             success: true,
             user: {
                 id: mockUser.id,

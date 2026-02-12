@@ -10,10 +10,6 @@ vi.mock("../db", () => ({
     },
 }));
 
-vi.mock("../auth/authenticateToken", () => ({
-    authenticateToken: (req: any, res: any, next: any) => next(),
-}));
-
 const app = express();
 app.use(express.json());
 app.use("/categories", categoryRouter);
@@ -43,6 +39,7 @@ describe("GET /categories", () => {
         expect(response.status).toBe(200);
         expect(response.body).toEqual({
             success: true,
+            message: "",
             categories: mockCategories,
         });
     });
@@ -61,6 +58,7 @@ describe("GET /categories", () => {
         expect(response.status).toBe(200);
         expect(response.body).toEqual({
             success: true,
+            message: "",
             categories: [],
         });
     });

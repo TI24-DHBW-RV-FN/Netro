@@ -1,10 +1,9 @@
 import { transporter } from "./transporter.js";
-import { verificationEmailData } from "./emailTypes.js";
 
-export async function sendEmail(data: verificationEmailData): Promise<void> {
+export async function sendEmail(userEmail: string, verificationCode: string): Promise<void> {
     const mailOptions = {
         from: `"${process.env.APP_NAME}" <${process.env.OFFICE365_EMAIL}>`,
-        to: data.userEmail,
+        to: userEmail,
         subject: "Welcome to Netro, Verify your email address",
         html: `
             <!DOCTYPE html>
@@ -17,8 +16,9 @@ export async function sendEmail(data: verificationEmailData): Promise<void> {
             <body>
                 <div class="container">
                     <h2>Welcome to ${process.env.APP_NAME}!</h2>
-                    <p>Pleasy verify</p>
-                    <div class="codeBox">${data.verificationCode}</div>
+                    <p>Please verify</p>
+                    <div class="codeBox">${verificationCode}</div>
+                </div>
             </body>
             </html>
         `,

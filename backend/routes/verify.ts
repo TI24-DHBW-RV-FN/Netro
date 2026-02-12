@@ -2,6 +2,7 @@ import { Router, Request, Response } from "express";
 import { pool } from "../db.js";
 import { authenticateToken } from "../token/authenticateToken.js";
 import { sendVerificationEmail } from "../email/sendVerificationEmail.js";
+import { ErrorMessages, SuccessMessages, sendError, sendSuccess } from "../helpers/ErrorMessages.js";
 
 const router = Router();
 
@@ -12,17 +13,12 @@ router.post("/email", authenticateToken, async (req: Request, res: Response) => 
         const { verificationToken } = req.body;
         const userId = (req as any).user.userId;
 
-        // Validate input
         if (!verificationToken) {
-            return res.status(400).json({
-                success: false,
-                message: "Verification token is required",
-            });
+            return sendError(res, 400, ErrorMessages.VERIFICATION_TOKEN_REQUIRED);
         }
 
         await client.query("BEGIN");
 
-        // Get user with verification details
         const userResult = await client.query(
             "SELECT id, email, email_verified, verification_token, verification_token_expires FROM users WHERE id = $1",
             [userId],
@@ -30,54 +26,34 @@ router.post("/email", authenticateToken, async (req: Request, res: Response) => 
 
         if (userResult.rows.length === 0) {
             await client.query("ROLLBACK");
-            return res.status(404).json({
-                success: false,
-                message: "User not found",
-            });
+            return sendError(res, 404, ErrorMessages.USER_NOT_FOUND);
         }
 
         const user = userResult.rows[0];
 
-        // Check if already verified
         if (user.email_verified) {
             await client.query("ROLLBACK");
-            return res.status(400).json({
-                success: false,
-                message: "Email is already verified",
-            });
+            return sendError(res, 400, ErrorMessages.EMAIL_ALREADY_VERIFIED);
         }
 
-        // Check if verification token exists
         if (!user.verification_token) {
             await client.query("ROLLBACK");
-            return res.status(400).json({
-                success: false,
-                message: "No verification token found. Please request a new one.",
-            });
+            return sendError(res, 400, ErrorMessages.NO_VERIFICATION_TOKEN);
         }
 
-        // Check if token matches
         if (user.verification_token !== verificationToken) {
             await client.query("ROLLBACK");
-            return res.status(400).json({
-                success: false,
-                message: "Invalid verification token",
-            });
+            return sendError(res, 400, ErrorMessages.INVALID_VERIFICATION_TOKEN);
         }
 
-        // Check if token has expired
         const now = new Date();
         const expiresAt = new Date(user.verification_token_expires);
 
         if (now > expiresAt) {
             await client.query("ROLLBACK");
-            return res.status(400).json({
-                success: false,
-                message: "Verification token has expired. Please request a new one.",
-            });
+            return sendError(res, 400, ErrorMessages.VERIFICATION_TOKEN_EXPIRED);
         }
 
-        // Update user: set email_verified to true and clear verification fields
         await client.query(
             `UPDATE users 
              SET email_verified = true, 
@@ -90,17 +66,11 @@ router.post("/email", authenticateToken, async (req: Request, res: Response) => 
 
         await client.query("COMMIT");
 
-        res.json({
-            success: true,
-            message: "Email verified successfully",
-        });
+        sendSuccess(res, 200, SuccessMessages.EMAIL_VERIFIED);
     } catch (error) {
         await client.query("ROLLBACK");
         console.error("Email verification error:", error);
-        res.status(500).json({
-            success: false,
-            message: "Failed to verify email",
-        });
+        sendError(res, 500, ErrorMessages.VERIFICATION_FAILED);
     } finally {
         client.release();
     }
@@ -114,7 +84,6 @@ router.get("/code", authenticateToken, async (req: Request, res: Response) => {
 
         await client.query("BEGIN");
 
-        // Get user details
         const userResult = await client.query(
             "SELECT id, email, email_verified, verification_token, verification_token_expires FROM users WHERE id = $1",
             [userId],
@@ -122,28 +91,19 @@ router.get("/code", authenticateToken, async (req: Request, res: Response) => {
 
         if (userResult.rows.length === 0) {
             await client.query("ROLLBACK");
-            return res.status(404).json({
-                success: false,
-                message: "User not found",
-            });
+            return sendError(res, 404, ErrorMessages.USER_NOT_FOUND);
         }
 
         const user = userResult.rows[0];
 
-        // Check if already verified
         if (user.email_verified) {
             await client.query("ROLLBACK");
-            return res.status(400).json({
-                success: false,
-                message: "Email is already verified",
-            });
+            return sendError(res, 400, ErrorMessages.EMAIL_ALREADY_VERIFIED);
         }
 
-        // Generate new 6-digit verification code
         const verificationCode = await sendVerificationEmail(user.email);
         const tokenExpires = new Date(Date.now() + 5 * 60 * 1000);
 
-        // Update user with new verification code and expiration
         await client.query(
             `UPDATE users 
              SET verification_token = $1, 
@@ -155,20 +115,16 @@ router.get("/code", authenticateToken, async (req: Request, res: Response) => {
 
         await client.query("COMMIT");
 
-        res.json({
-            success: true,
-            message: "Verification code sent successfully. Please check your email.",
+        sendSuccess(res, 200, SuccessMessages.VERIFICATION_CODE_SENT, {
             expiresIn: "5 minutes",
         });
     } catch (error) {
         await client.query("ROLLBACK");
         console.error("Send verification code error:", error);
-        res.status(500).json({
-            success: false,
-            message: "Failed to send verification code",
-        });
+        sendError(res, 500, ErrorMessages.VERIFICATION_CODE_SEND_FAILED);
     } finally {
         client.release();
     }
 });
+
 export default router;
