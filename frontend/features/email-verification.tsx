@@ -1,6 +1,4 @@
-import dotenv from "dotenv";
-
-dotenv.config();
+import {env} from "../config/env";
 
 type EmailVerificationRequest = {
     email: string;
@@ -14,7 +12,7 @@ type EmailVerificationCodeResponse = {};
 export async function emailVerificationApi(
     payload: EmailVerificationRequest
 ): Promise<EmailVerificationResponse> {
-    const response = await fetch(`${process.env.API_URL}/verify/code`, {
+    const response = await fetch(`${env.apiUrl}/verify/code`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -33,7 +31,7 @@ export async function emailVerificationApi(
 export async function emailVerificationCodeApi(
     payload: EmailVerificationCodeRequest
 ): Promise<EmailVerificationCodeResponse> {
-    const response = await fetch(`${process.env.API_URL}/verify/email`, {
+    const response = await fetch(`${env.apiUrl}/verify/email`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

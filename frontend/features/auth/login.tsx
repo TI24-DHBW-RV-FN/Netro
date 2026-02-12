@@ -1,10 +1,7 @@
 import { useState } from "react";
 import { loginApi } from "./api";
+import { env } from "../../config/env"
 import { useAuth } from "./authContext";
-import dotenv from "dotenv";
-
-dotenv.config();
-
 
 export function useLogin() {
     const { signIn } = useAuth();
@@ -28,7 +25,7 @@ export function useLogin() {
 
             const data = await loginApi({ email, password });
 
-            if (process.env.type == "dev") {
+            if (env.type == "dev") {
                 console.log("Logged in!", data);
             }
 
