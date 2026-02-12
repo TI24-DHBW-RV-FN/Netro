@@ -10,10 +10,6 @@ vi.mock("../db", () => ({
     },
 }));
 
-vi.mock("../auth/authenticateToken", () => ({
-    authenticateToken: (req: any, res: any, next: any) => next(),
-}));
-
 const app = express();
 app.use(express.json());
 app.use("/categories", categoryRouter);
