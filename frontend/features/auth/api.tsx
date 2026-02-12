@@ -1,4 +1,6 @@
-import {env} from "../../config/env";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 type LoginRequest = {
     email: string;
@@ -33,7 +35,7 @@ type SignupResponse = {
 export async function loginApi(
     payload: LoginRequest
 ): Promise<LoginResponse> {
-    const response = await fetch(`${env.apiUrl}/login`, {
+    const response = await fetch(`${process.env.API_URL}/login`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -52,7 +54,7 @@ export async function loginApi(
 export async function signupApi(
     payload: SignupRequest
 ): Promise<SignupResponse> {
-    const response = await fetch(`${env.apiUrl}/register`, {
+    const response = await fetch(`${process.env.API_URL}/register`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -73,7 +75,7 @@ export type GetCategoriesResponse = {
 };
 
 export async function getCategoriesApi(): Promise<GetCategoriesResponse> {
-    const response = await fetch(`${env.apiUrl}/category`, {
+    const response = await fetch(`${process.env.API_URL}/category`, {
         method: "GET",
     });
 
