@@ -16,7 +16,7 @@ export async function sendEmail(userEmail: string, verificationCode: string): Pr
             <body>
                 <div class="container">
                     <h2>Welcome to ${process.env.APP_NAME}!</h2>
-                    <p>Pleasy verify</p>
+                    <p>Please verify</p>
                     <div class="codeBox">${verificationCode}</div>
                 </div>
             </body>
