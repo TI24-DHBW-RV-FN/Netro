@@ -8,10 +8,9 @@
     "type": "module",
     "keywords": [],
     "scripts": {
-        "test": "npx vitest",
-        "start": "node dist/app.js",
-        "dev": "npx tsx watch app.ts",
-        "build": "npx tsc"
+        "start": "node dist/server.js",
+        "dev": "tsx watch server.ts",
+        "test": "vitest"
     },
     "dependencies": {
         "bcrypt": "^6.0.0",
