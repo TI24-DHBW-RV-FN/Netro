@@ -5,11 +5,8 @@ import {
     TextInput,
     TouchableOpacity,
     ScrollView,
-    Image,
-    StyleSheet,
 } from 'react-native';
 import { styles } from "./styles";
-import {router} from "expo-router";
 
 interface UserData {
     name: string;
@@ -174,9 +171,9 @@ function EditView({
 
     return (
         <ScrollView style={styles.container}>
-            <Text style={styles.title}>Kontoeinstellungen</Text>
+            <Text style={styles.title}>Account settings</Text>
 
-            {/* Profilbereich - Bearbeiten */}
+            {/* Profile - edit */}
             <View style={styles.profileSection}>
                 <View style={styles.profileImageContainer}>
                     <TouchableOpacity style={styles.profileImagePlaceholder}>
@@ -200,7 +197,7 @@ function EditView({
                 </View>
             </View>
 
-            {/* Bio - Bearbeiten */}
+            {/* Bio - edit */}
             <View style={styles.bioSection}>
                 <TextInput
                     style={[styles.input, styles.bioInput]}
@@ -222,7 +219,7 @@ function EditView({
                 </TouchableOpacity>
             </View>
 
-            {/* Events Liste */}
+            {/* Events list */}
             <View style={styles.eventsList}>
                 {events.map((event, index) => (
                     <View key={event.id} style={styles.eventItem}>

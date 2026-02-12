@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
 
-// Hilfsfunktion für plattformübergreifendes Speichern
+// Helper functions to abstract away the storage mechanism
 const storage = {
     async getItem(key: string) {
         if (Platform.OS === 'web') {
@@ -50,7 +50,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         const loadAuth = async () => {
             try {
-                // Nutzt jetzt unsere Hilfsfunktion statt direkt SecureStore
                 const storedToken = await storage.getItem("token");
                 const storedUser = await storage.getItem("user");
 
@@ -59,7 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     setUser(JSON.parse(storedUser));
                 }
             } catch (e) {
-                console.error("Fehler beim Laden des Auth-Status", e);
+                console.error("Error while accessing auth status", e);
             } finally {
                 setIsLoading(false);
             }

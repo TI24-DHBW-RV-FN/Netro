@@ -4,16 +4,15 @@ type EmailVerificationRequest = {
     email: string;
 };
 type EmailVerificationCodeRequest = {
-    email: string;
-    code: string;
+    verificationToken: string;
 };
 type EmailVerificationResponse = {};
 type EmailVerificationCodeResponse = {};
 
-export async function EmailVerificationApi(
+export async function emailVerificationApi(
     payload: EmailVerificationRequest
 ): Promise<EmailVerificationResponse> {
-    const response = await fetch(`${env.apiUrl}/email-verification`, { //ToDo: add correct api call (doesnt yet exist)
+    const response = await fetch(`${env.apiUrl}/verify/code`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -29,10 +28,10 @@ export async function EmailVerificationApi(
     return response.json();
 }
 
-export async function EmailVerificationCodeApi(
+export async function emailVerificationCodeApi(
     payload: EmailVerificationCodeRequest
 ): Promise<EmailVerificationCodeResponse> {
-    const response = await fetch(`${env.apiUrl}/email-verification-code`, { //ToDo: add correct api call (doesnt yet exist)
+    const response = await fetch(`${env.apiUrl}/verify/email`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

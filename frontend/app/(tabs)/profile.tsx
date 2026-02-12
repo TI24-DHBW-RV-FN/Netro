@@ -12,7 +12,7 @@ export default function ProfileScreen() {
         try {
             // Task: "Removal of Login Tokens"
             await signOut();
-            // Task: "Redirect to Login/Register"
+            // Task: "Redirect to Log in/Register"
             router.replace('/login');
         } catch (error) {
             console.error("Failed to sign out:", error);
@@ -26,11 +26,9 @@ export default function ProfileScreen() {
                 <Text style={homeStyles.headerTitle}>Profile</Text>
             </View>
 
-            {/* Using homeStyles.content because it is already defined in your styles.ts */}
             <View style={homeStyles.content}>
                 <TouchableOpacity style={authStyles.button} onPress={handleLogout}>
-                    {/* Task: Button must say "Ausloggen" */}
-                    <Text style={authStyles.buttonText}>Ausloggen</Text>
+                    <Text style={authStyles.buttonText}>Log out</Text>
                 </TouchableOpacity>
 
                 <Text style={{ color: themeColors.text, marginTop: 20 }}>
