@@ -165,7 +165,7 @@ describe("User Routes", () => {
             });
 
             expect(response.status).toBe(400);
-            expect(response.body.message).toBe("Old password and new password are required");
+            expect(response.body.message).toBe("Old email and new email are required");
         });
 
         it("should return 400 if new email is missing", async () => {
@@ -174,7 +174,7 @@ describe("User Routes", () => {
             });
 
             expect(response.status).toBe(400);
-            expect(response.body.message).toBe("Old password and new password are required");
+            expect(response.body.message).toBe("Old email and new email are required");
         });
 
         it("should return 404 if user not found", async () => {

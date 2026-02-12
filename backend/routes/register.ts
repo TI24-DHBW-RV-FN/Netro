@@ -4,6 +4,7 @@ import { hashPassword } from "../hash/hashPassword.js";
 import { generateToken } from "../token/generateToken.js";
 import { validateRegistrationInput } from "../helpers/validateRegistrationInput.js";
 import { sendVerificationEmail } from "../email/sendVerificationEmail.js";
+import { ErrorMessages, SuccessMessages, sendError, sendSuccess } from "../helpers/ErrorMessages.js";
 
 const router = Router();
 
@@ -13,11 +14,7 @@ router.post("/", async (req: Request, res: Response) => {
     try {
         const validation = validateRegistrationInput(req.body);
         if (!validation.valid) {
-            return res.status(400).json({
-                success: false,
-                message: "Validation failed",
-                errors: validation.errors,
-            });
+            return sendError(res, 400, ErrorMessages.VALIDATION_FAILED, validation.errors);
         }
 
         const { email, password, userName, currentLocation, bio, categories } = req.body;
@@ -28,10 +25,7 @@ router.post("/", async (req: Request, res: Response) => {
 
         if (userExists.rows.length > 0) {
             await client.query("ROLLBACK");
-            return res.status(409).json({
-                success: false,
-                message: "User with this email already exists",
-            });
+            return sendError(res, 409, ErrorMessages.USER_EXISTS);
         }
 
         const passwordHash = await hashPassword(password);
@@ -53,11 +47,7 @@ router.post("/", async (req: Request, res: Response) => {
                 await client.query("ROLLBACK");
                 const validCategories = categoryCheck.rows.map((c) => c.name);
                 const invalidCategories = categories.filter((categoryName: string) => !validCategories.includes(categoryName));
-                return res.status(400).json({
-                    success: false,
-                    message: "Invalid categories provided",
-                    invalidCategories,
-                });
+                return sendError(res, 400, ErrorMessages.INVALID_CATEGORIES, undefined, invalidCategories);
             }
 
             const categoryIds = categoryCheck.rows.map((c) => c.id);
@@ -73,9 +63,7 @@ router.post("/", async (req: Request, res: Response) => {
 
         const token = generateToken(newUser.id, newUser.email, process.env.JWT_SECRET!);
 
-        res.status(201).json({
-            success: true,
-            message: "Registration successful",
+        sendSuccess(res, 201, SuccessMessages.REGISTRATION_SUCCESS, {
             token,
             user: {
                 id: newUser.id,
@@ -90,10 +78,7 @@ router.post("/", async (req: Request, res: Response) => {
     } catch (error) {
         await client.query("ROLLBACK");
         console.error("Registration error:", error);
-        res.status(500).json({
-            success: false,
-            message: "Registration failed",
-        });
+        sendError(res, 500, ErrorMessages.REGISTRATION_FAILED);
     } finally {
         client.release();
     }

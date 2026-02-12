@@ -2,6 +2,7 @@ import { Router, Request, Response } from "express";
 import { pool } from "../db.js";
 import { comparePassword } from "../hash/comparePassword.js";
 import { generateToken } from "../token/generateToken.js";
+import { ErrorMessages, SuccessMessages, sendError, sendSuccess } from "../helpers/ErrorMessages.js";
 
 const router = Router();
 
@@ -12,26 +13,17 @@ router.post("/", async (req: Request, res: Response) => {
         const { email, password } = req.body;
 
         if (!email || !password) {
-            return res.status(400).json({
-                success: false,
-                message: "Email and password are required",
-            });
+            return sendError(res, 400, ErrorMessages.EMAIL_PASSWORD_REQUIRED);
         }
 
         if (!EMAIL_REGEX.test(email)) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid email format",
-            });
+            return sendError(res, 400, ErrorMessages.INVALID_EMAIL_FORMAT);
         }
 
         const result = await pool.query("SELECT id, email, password_hash, user_name, current_location, bio FROM users WHERE email = $1", [email]);
 
         if (result.rows.length === 0) {
-            return res.status(401).json({
-                success: false,
-                message: "Invalid email or password",
-            });
+            return sendError(res, 401, ErrorMessages.INVALID_CREDENTIALS);
         }
 
         const user = result.rows[0];
@@ -39,10 +31,7 @@ router.post("/", async (req: Request, res: Response) => {
         const isValidPassword = await comparePassword(password, user.password_hash);
 
         if (!isValidPassword) {
-            return res.status(401).json({
-                success: false,
-                message: "Invalid email or password",
-            });
+            return sendError(res, 401, ErrorMessages.INVALID_CREDENTIALS);
         }
 
         await pool.query("UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = $1", [user.id]);
@@ -56,12 +45,9 @@ router.post("/", async (req: Request, res: Response) => {
         );
 
         const categories = categoriesResult.rows.map((row) => row.name);
-
         const token = generateToken(user.id, user.email, process.env.JWT_SECRET!);
 
-        res.status(200).json({
-            success: true,
-            message: "Login successful",
+        sendSuccess(res, 200, SuccessMessages.LOGIN_SUCCESS, {
             token,
             user: {
                 id: user.id,
@@ -74,10 +60,7 @@ router.post("/", async (req: Request, res: Response) => {
         });
     } catch (error) {
         console.error("Login error:", error);
-        res.status(500).json({
-            success: false,
-            message: "Login failed",
-        });
+        sendError(res, 500, ErrorMessages.LOGIN_FAILED);
     }
 });
 

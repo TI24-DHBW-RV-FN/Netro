@@ -39,6 +39,7 @@ describe("GET /categories", () => {
         expect(response.status).toBe(200);
         expect(response.body).toEqual({
             success: true,
+            message: "",
             categories: mockCategories,
         });
     });
@@ -57,6 +58,7 @@ describe("GET /categories", () => {
         expect(response.status).toBe(200);
         expect(response.body).toEqual({
             success: true,
+            message: "",
             categories: [],
         });
     });

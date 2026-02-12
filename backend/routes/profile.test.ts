@@ -84,6 +84,7 @@ describe("GET /profile", () => {
 
         expect(response.status).toBe(200);
         expect(response.body).toEqual({
+            message: "",
             success: true,
             user: {
                 id: mockUser.id,
