@@ -44,7 +44,7 @@ app.get("/health", async (req, res) => {
 app.use("/register", registerRouter);
 app.use("/login", loginRouter);
 app.use("/profile", profileRouter);
-app.use("/edit", editRouter);
+// app.use("/edit", editRouter);
 app.use("/category", categoryRouter);
 app.use("/verify", verifyRouter);
 app.use("/event", eventRouter);
