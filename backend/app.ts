@@ -6,7 +6,7 @@ import profileRouter from "./routes/profile.js";
 import editRouter from "./routes/edit.js";
 import categoryRouter from "./routes/category.js";
 import verifyRouter from "./routes/verify.js";
-// import eventRouter from "./routes/event.js";
+import eventRouter from "./routes/event.js";
 import { pool } from "./db.js";
 import swaggerUi from "swagger-ui-express";
 import YAML from "yamljs";
@@ -47,7 +47,7 @@ app.use("/profile", profileRouter);
 app.use("/edit", editRouter);
 app.use("/category", categoryRouter);
 app.use("/verify", verifyRouter);
-// app.use("/event", eventRouter);
+app.use("/event", eventRouter);
 
 // Only start server if this file is run directly (not imported in tests)
 if (import.meta.main) {

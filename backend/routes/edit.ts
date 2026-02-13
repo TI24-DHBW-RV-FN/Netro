@@ -8,7 +8,7 @@ import { ErrorMessages, SuccessMessages, sendError, sendSuccess } from "../helpe
 
 const router = Router();
 
-router.post("/password", authenticateToken, async (req: Request, res: Response) => {
+router.put("/password", authenticateToken, async (req: Request, res: Response) => {
     try {
         const { oldPassword, newPassword } = req.body;
         const userId = (req as any).user.userId;
@@ -46,7 +46,7 @@ router.post("/password", authenticateToken, async (req: Request, res: Response) 
     }
 });
 
-router.post("/email", authenticateToken, async (req: Request, res: Response) => {
+router.put("/email", authenticateToken, async (req: Request, res: Response) => {
     try {
         const { oldEmail, newEmail } = req.body;
         const userId = (req as any).user.userId;
@@ -67,12 +67,6 @@ router.post("/email", authenticateToken, async (req: Request, res: Response) => 
             return sendError(res, 401, ErrorMessages.EMAIL_INCORRECT);
         }
 
-        // verify new email
-        // verify new email
-        // verify new email
-        // verify new email
-        // verify new email
-
         await pool.query("UPDATE users SET email = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2", [newEmail, userId]);
 
         sendSuccess(res, 200, SuccessMessages.EMAIL_UPDATED);
@@ -82,7 +76,7 @@ router.post("/email", authenticateToken, async (req: Request, res: Response) => 
     }
 });
 
-router.post("/profile", authenticateToken, async (req: Request, res: Response) => {
+router.put("/profile", authenticateToken, async (req: Request, res: Response) => {
     const client = await pool.connect();
 
     try {

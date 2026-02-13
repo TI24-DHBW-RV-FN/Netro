@@ -55,16 +55,19 @@ CREATE TABLE IF NOT EXISTS events (
     start_time TIMESTAMP NOT NULL,
     location VARCHAR(100) NOT NULL,
     series_event BOOLEAN DEFAULT false,
-    frequency VARCHAR(100)
+    frequency VARCHAR(100),
+    created_by_user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE
 );
 -- Index for faster event lookups
 CREATE INDEX IF NOT EXISTS idx_events_title ON events(title);
+-- Index for faster user event lookups
+CREATE INDEX IF NOT EXISTS idx_events_created_by_user_id ON events(created_by_user_id);
 -- --------------------------------------------------------
 -- EVENT_CATEGORIES (Many - to - Many Junction Table)
 -- --------------------------------------------------------
 CREATE TABLE IF NOT EXISTS events_categories (
     events_id INTEGER NOT NULL REFERENCES events(id) ON DELETE CASCADE,
-    category_id INTEGER NOT NULL REFERENCES category(id) ON DELETE CASCADE,
+    category_id INTEGER NOT NULL REFERENCES category(id) ON DELETE RESTRICT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (events_id, category_id)
 );
