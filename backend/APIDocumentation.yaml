@@ -227,7 +227,7 @@ paths:
                 success: false
                 message: Login failed
 
-  /profile:
+  /profile/info:
     get:
       tags:
         - Profile
@@ -276,7 +276,7 @@ paths:
                 success: false
                 message: Failed to fetch user profile
 
-  /edit/profile:
+  /profile/edit/info:
     put:
       tags:
         - Profile
@@ -359,7 +359,7 @@ paths:
                 success: false
                 message: Failed to update profile
 
-  /edit/password:
+  /profile/edit/password:
     put:
       tags:
         - Profile
@@ -447,7 +447,7 @@ paths:
                 success: false
                 message: Failed to update password
 
-  /edit/email:
+  /profile/edit/email:
     put:
       tags:
         - Profile
