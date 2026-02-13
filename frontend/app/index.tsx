@@ -28,6 +28,10 @@ export default function HomeScreen() {
                 <Text style={authStyles.buttonText}>Sign Up</Text>
             </TouchableOpacity>
 
+            <TouchableOpacity style={authStyles.button} onPress={() => router.push('tmp_layout')}>
+                <Text style={authStyles.buttonText}>Test</Text>
+            </TouchableOpacity>
+
         </View>
     );
 }

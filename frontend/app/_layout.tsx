@@ -11,7 +11,7 @@ export default function RootLayout() {
         async function prepare() {
             try {
                 // TODO: Load await (example loadResourcesAsync()
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                await new Promise(resolve => setTimeout(resolve, 20));
             } catch (e) {
                 console.warn("Error while Loading:", e);
             } finally {
