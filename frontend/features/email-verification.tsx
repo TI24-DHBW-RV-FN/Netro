@@ -1,9 +1,10 @@
 import {env} from "../config/env";
 
 type EmailVerificationRequest = {
-    email: string;
+    authenticationToken: string;
 };
 type EmailVerificationCodeRequest = {
+    authenticationToken: string;
     verificationToken: string;
 };
 type EmailVerificationResponse = {};
@@ -13,7 +14,7 @@ export async function emailVerificationApi(
     payload: EmailVerificationRequest
 ): Promise<EmailVerificationResponse> {
     const response = await fetch(`${env.apiUrl}/verify/code`, {
-        method: "POST",
+        method: "GET",
         headers: {
             "Content-Type": "application/json",
         },

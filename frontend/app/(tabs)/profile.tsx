@@ -21,7 +21,6 @@ export default function ProfileScreen() {
 
     return (
         <SafeAreaView style={homeStyles.container}>
-            {}
             <View style={homeStyles.header}>
                 <Text style={homeStyles.headerTitle}>Profile</Text>
             </View>

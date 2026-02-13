@@ -38,7 +38,7 @@ export function useSubmitSignup() {
 
             await signIn(data.token, data.user);
             router.replace("/");
-            
+            return true
         } catch ( err: unknown) {
             const message = err instanceof Error ? err.message : "Something went wrong";
             setError(message);

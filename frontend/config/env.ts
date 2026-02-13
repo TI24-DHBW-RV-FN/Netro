@@ -10,6 +10,6 @@ const readEnv = (key: string, fallback = "") => {
 };
 
 export const env = {
-    apiUrl: readEnv("EXPO_PUBLIC_API_URL", "http://localhost:3000/"),
+    apiUrl: readEnv("EXPO_PUBLIC_API_URL", "http://localhost:3000"),
     type: readEnv("EXPO_PUBLIC_TYPE", "dev"),
 };
