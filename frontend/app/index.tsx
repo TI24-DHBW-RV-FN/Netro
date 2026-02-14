@@ -27,11 +27,6 @@ export default function HomeScreen() {
             <TouchableOpacity style={authStyles.button} onPress={() => router.push('/(auth)/signup')}>
                 <Text style={authStyles.buttonText}>Sign Up</Text>
             </TouchableOpacity>
-
-            <TouchableOpacity style={authStyles.button} onPress={() => router.push('tmp_layout')}>
-                <Text style={authStyles.buttonText}>Test</Text>
-            </TouchableOpacity>
-
         </View>
     );
 }
