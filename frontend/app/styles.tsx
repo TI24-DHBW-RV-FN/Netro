@@ -2,7 +2,7 @@ import {StyleSheet, Dimensions, Platform} from 'react-native';
 
 const createTheme = (isDark: boolean) => ({
     background: {
-        primary: isDark ? '#000000' : '#FFFFFF',
+        primary: isDark ? '#000000' : '#F1F3F5',
         secondary: isDark ? '#1A1A1A' : '#F8F9FA',
         tertiary: isDark ? '#2A2A2A' : '#F0F2F5',
         elevated: isDark ? '#1F1F1F' : '#FFFFFF',
@@ -15,17 +15,8 @@ const createTheme = (isDark: boolean) => ({
         inverse: isDark ? '#1A1A1A' : '#FFFFFF',
     },
 
-    accent: {
-        primary: '#FF3B5C',
-        secondary: '#FF6B88',
-        tertiary: '#FFA5B8',
-        gradient: {
-            start: '#FF3B5C',
-            end: '#FF6B88',
-        },
-    },
 
-    accentAlt: {
+    accent: {
         primary: '#6C5CE7',
         secondary: '#A29BFE',
         gradient: {
@@ -171,7 +162,8 @@ export const createStyles = (theme: ReturnType<typeof createTheme>) => StyleShee
         backgroundColor: theme.background.elevated,
         borderRadius: RADIUS.lg,
         padding: SPACING.base,
-        marginBottom: SPACING.base,
+        marginTop: SPACING.base,
+        marginHorizontal: SPACING.base,
         ...Platform.select({
             ios: {
                 shadowColor: theme.shadow,
@@ -324,16 +316,238 @@ export const createStyles = (theme: ReturnType<typeof createTheme>) => StyleShee
         fontSize: FONTS.xxl,
         fontWeight: FONTS.weights.bold,
         ...(Platform.OS === 'web' && {
-            backgroundImage: `linear-gradient(to right, ${theme.accentAlt.gradient.start}, ${theme.accentAlt.gradient.end})`,
+            backgroundImage: `linear-gradient(to right, ${theme.accent.gradient.start}, ${theme.accent.gradient.end})`,
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text',
         }),
         ...Platform.select({
-            ios: { color: theme.accentAlt.primary },
-            android: { color: theme.accentAlt.primary },
+            ios: { color: theme.accent.primary },
+            android: { color: theme.accent.primary },
         }),
     },
+
+    // ============================================
+    // BUTTONS - Minimalist & Modern
+    // ============================================
+
+    button: {
+        backgroundColor: theme.accent.primary,
+        borderRadius: RADIUS.full,
+        paddingVertical: SPACING.base,
+        paddingHorizontal: SPACING.xl,
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: 48,
+        ...Platform.select({
+            ios: {
+                shadowColor: theme.accent.primary,
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.2,
+                shadowRadius: 8,
+            },
+            android: {
+                elevation: 2,
+            },
+        }),
+    },
+
+    buttonText: {
+        color: theme.text.inverse,
+        fontSize: FONTS.base,
+        fontWeight: FONTS.weights.semibold,
+        letterSpacing: 0.3,
+    },
+
+    buttonSecondary: {
+        backgroundColor: 'transparent',
+        borderWidth: 1.5,
+        borderColor: theme.border.medium,
+        borderRadius: RADIUS.full,
+        paddingVertical: SPACING.base,
+        paddingHorizontal: SPACING.xl,
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: 48,
+    },
+
+    buttonSecondaryText: {
+        color: theme.text.primary,
+        fontSize: FONTS.base,
+        fontWeight: FONTS.weights.semibold,
+        letterSpacing: 0.3,
+    },
+
+    buttonGhost: {
+        backgroundColor: 'transparent',
+        paddingVertical: SPACING.md,
+        paddingHorizontal: SPACING.lg,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+
+    buttonGhostText: {
+        color: theme.text.secondary,
+        fontSize: FONTS.base,
+        fontWeight: FONTS.weights.medium,
+    },
+
+    buttonDisabled: {
+        backgroundColor: theme.interactive.disabled,
+        opacity: 0.6,
+    },
+
+    buttonSmall: {
+        paddingVertical: SPACING.sm,
+        paddingHorizontal: SPACING.lg,
+        minHeight: 36,
+    },
+
+    buttonLarge: {
+        paddingVertical: SPACING.lg,
+        paddingHorizontal: SPACING.xxl,
+        minHeight: 56,
+    },
+
+    iconButton: {
+        width: 44,
+        height: 44,
+        borderRadius: RADIUS.full,
+        backgroundColor: theme.background.secondary,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+
+    iconButtonPrimary: {
+        width: 44,
+        height: 44,
+        borderRadius: RADIUS.full,
+        backgroundColor: theme.accent.primary,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+
+    // ============================================
+    // INPUT FIELDS - Clean & Functional
+    // ============================================
+
+    inputContainer: {
+        marginBottom: SPACING.base,
+    },
+
+    inputLabel: {
+        fontSize: FONTS.sm,
+        fontWeight: FONTS.weights.medium,
+        color: theme.text.secondary,
+        marginBottom: SPACING.xs,
+    },
+
+    input: {
+        backgroundColor: theme.background.secondary,
+        borderRadius: RADIUS.md,
+        borderWidth: 1,
+        borderColor: theme.border.light,
+        paddingHorizontal: SPACING.base,
+        paddingVertical: SPACING.md,
+        fontSize: FONTS.base,
+        color: theme.text.primary,
+        minHeight: 48,
+    },
+
+    inputFocused: {
+        borderColor: theme.accent.primary,
+        borderWidth: 2,
+        backgroundColor: theme.background.elevated,
+    },
+
+    inputError: {
+        borderColor: theme.status.error,
+        borderWidth: 1,
+    },
+
+    inputErrorText: {
+        fontSize: FONTS.xs,
+        color: theme.status.error,
+        marginTop: SPACING.xs,
+        fontWeight: FONTS.weights.medium,
+    },
+
+    textArea: {
+        backgroundColor: theme.background.secondary,
+        borderRadius: RADIUS.md,
+        borderWidth: 1,
+        borderColor: theme.border.light,
+        paddingHorizontal: SPACING.base,
+        paddingVertical: SPACING.md,
+        fontSize: FONTS.base,
+        color: theme.text.primary,
+        minHeight: 120,
+        textAlignVertical: 'top',
+    },
+
+    inputWrapper: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        position: 'relative',
+    },
+
+    inputIcon: {
+        position: 'absolute',
+        left: SPACING.md,
+        zIndex: 1,
+    },
+
+    inputIconTextArea: {
+        position: 'absolute',
+        left: SPACING.md,
+        top: SPACING.md,
+        zIndex: 1,
+    },
+
+    inputWithIcon: {
+        flex: 1,
+        height: 48,
+        backgroundColor: theme.background.secondary,
+        borderRadius: RADIUS.md,
+        paddingHorizontal: SPACING.base,
+        paddingLeft: 44,
+        fontSize: FONTS.base,
+        color: theme.text.primary,
+        borderWidth: 1,
+        borderColor: theme.border.light,
+    },
+
+    textAreaWithIcon: {
+        flex: 1,
+        backgroundColor: theme.background.secondary,
+        borderRadius: RADIUS.md,
+        paddingHorizontal: SPACING.base,
+        paddingLeft: 44,
+        paddingVertical: SPACING.md,
+        fontSize: FONTS.base,
+        color: theme.text.primary,
+        borderWidth: 1,
+        borderColor: theme.border.light,
+        minHeight: 100,
+        textAlignVertical: 'top',
+    },
+
+    inputButton: {
+        position: 'absolute',
+        right: SPACING.md,
+        width: 40,
+        height: 40,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: RADIUS.sm,
+        backgroundColor: theme.background.tertiary,
+    },
+
+    inputButtonPressed: {
+        backgroundColor: theme.interactive.pressed,
+        transform: [{ scale: 0.95 }],
+    },
+
     // ============================================
     // SPACING UTILITIES
     // ============================================
