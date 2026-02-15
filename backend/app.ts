@@ -3,7 +3,7 @@ import express from "express";
 import loginRouter from "./routes/login.js";
 import registerRouter from "./routes/register.js";
 import profileRouter from "./routes/profile.js";
-import editRouter from "./routes/edit.js";
+// import editRouter from "./routes/edit.js";
 import categoryRouter from "./routes/category.js";
 import verifyRouter from "./routes/verify.js";
 import eventRouter from "./routes/event.js";
