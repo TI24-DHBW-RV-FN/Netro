@@ -691,6 +691,298 @@ paths:
                 success: false
                 message: Failed to send verification code
 
+  /event/create:
+    post:
+      tags:
+        - Events
+      summary: Create a new event
+      description: Create a new event with title, description, location, and optional categories. If seriesEvent is false, frequency is automatically set to null.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - description
+                - startTime
+                - location
+              properties:
+                title:
+                  type: string
+                  maxLength: 100
+                  description: Event title
+                  example: Basketball Game
+                description:
+                  type: string
+                  maxLength: 255
+                  description: Event description
+                  example: Friendly basketball match at the park
+                startTime:
+                  type: string
+                  format: date-time
+                  description: Event start time in ISO 8601 format
+                  example: '2026-03-15T18:00:00Z'
+                location:
+                  type: string
+                  maxLength: 100
+                  description: Event location
+                  example: Central Park
+                seriesEvent:
+                  type: boolean
+                  default: false
+                  description: Whether this is a recurring event
+                  example: true
+                frequency:
+                  type: string
+                  maxLength: 100
+                  nullable: true
+                  description: Recurrence frequency (e.g., 'weekly', 'monthly'). Automatically set to null if seriesEvent is false.
+                  example: weekly
+                categories:
+                  type: array
+                  items:
+                    type: string
+                  description: Array of category names associated with the event
+                  example: ["basketball", "gaming"]
+      responses:
+        '201':
+          description: Event created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventCreateSuccessResponse'
+        '400':
+          description: Validation failed or invalid categories
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ValidationError'
+                  - $ref: '#/components/schemas/InvalidCategoriesError'
+              examples:
+                missingFields:
+                  value:
+                    success: false
+                    message: Validation failed
+                    errors: ["Title is required", "Description is required", "Start time is required", "Location is required"]
+                invalidStartTime:
+                  value:
+                    success: false
+                    message: Validation failed
+                    errors: ["Invalid start time format"]
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: User not found
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: Failed to create event
+
+  /event/edit:
+    put:
+      tags:
+        - Events
+      summary: Update an existing event
+      description: Update an existing event. Only the event creator can edit. If seriesEvent is set to false, frequency is automatically set to null. At least one field besides eventId must be provided.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - eventId
+              properties:
+                eventId:
+                  type: integer
+                  description: ID of the event to update
+                  example: 1
+                title:
+                  type: string
+                  maxLength: 100
+                  description: Updated event title
+                  example: Updated Basketball Game
+                description:
+                  type: string
+                  maxLength: 255
+                  description: Updated event description
+                  example: Updated description for the basketball match
+                startTime:
+                  type: string
+                  format: date-time
+                  description: Updated event start time
+                  example: '2026-03-16T19:00:00Z'
+                location:
+                  type: string
+                  maxLength: 100
+                  description: Updated event location
+                  example: Downtown Court
+                seriesEvent:
+                  type: boolean
+                  description: Whether this is a recurring event. Setting to false automatically sets frequency to null.
+                  example: false
+                frequency:
+                  type: string
+                  maxLength: 100
+                  nullable: true
+                  description: Updated recurrence frequency
+                  example: monthly
+                categories:
+                  type: array
+                  items:
+                    type: string
+                  description: Updated array of category names. Replaces all existing categories.
+                  example: ["basketball", "football"]
+              minProperties: 2
+      responses:
+        '200':
+          description: Event updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventUpdateSuccessResponse'
+        '400':
+          description: Validation failed or no fields provided
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ValidationError'
+                  - $ref: '#/components/schemas/InvalidCategoriesError'
+                  - $ref: '#/components/schemas/Error'
+              examples:
+                noFields:
+                  value:
+                    success: false
+                    message: At least one field must be provided to update
+                noEventId:
+                  value:
+                    success: false
+                    message: Validation failed
+                    errors: ["Event ID is required"]
+                invalidCategories:
+                  value:
+                    success: false
+                    message: Invalid categories provided
+                    invalidCategories: ["invalid_category"]
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - user does not own this event
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: You do not have permission to edit this event
+        '404':
+          description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: Event not found
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: Failed to update event
+  /event/info:
+    post:
+      tags:
+        - Events
+      summary: Get event info
+      description: Retrieve all information for a specific event, including its categories.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - eventId
+              properties:
+                eventId:
+                  type: integer
+                  description: ID of the event to retrieve
+                  example: 1
+      responses:
+        '200':
+          description: Event retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventInfoSuccessResponse'
+        '400':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+              example:
+                success: false
+                message: Validation failed
+                errors: ["Event ID is required"]
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: Event not found
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: Request failed
 components:
   securitySchemes:
     bearerAuth:
