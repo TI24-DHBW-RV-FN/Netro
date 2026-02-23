@@ -1,3 +1,4 @@
+import React from "react";
 import {View, Text, TouchableOpacity, Image} from "react-native";
 import {Redirect, router} from "expo-router";
 import { authStyles } from "./(auth)/styles";

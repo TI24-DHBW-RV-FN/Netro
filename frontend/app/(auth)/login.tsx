@@ -1,17 +1,18 @@
-import { View, Text, TouchableOpacity, TextInput} from "react-native";
+import React from 'react'; // Added to resolve potential UMD global issues
+import { View, Text, TouchableOpacity, TextInput } from "react-native";
 import { authStyles } from "./styles";
-import {router} from "expo-router"; // import the styles
-import { useLogin } from "../../features/auth/login"; // import your hook
-
+import { router } from "expo-router";
+import { useLogin } from "../../features/auth/login";
 
 export default function LoginScreen() {
-    const { email, setEmail, password, setPassword, error, login } = useLogin();
+    // Keep the hook for state management of the UI inputs
+    const { email, setEmail, password, setPassword, error } = useLogin();
 
-    const handleLogin = async () => {
-        const success = await login();
-        if (success) {
-            // no navigation needed!
-        }
+    // English comment according to Guideline 4
+    // Bypass authentication for UI development purposes
+    const handleBypassLogin = () => {
+        // Navigate directly to the landing page
+        router.replace("/(tabs)/home");
     };
 
     return (
@@ -23,6 +24,7 @@ export default function LoginScreen() {
             <Text style={authStyles.title}>Login</Text>
             <Text style={authStyles.subtitle}>Welcome back!</Text>
 
+            {/* Error display still functional for UI testing */}
             {error && <Text style={{ color: "red", marginBottom: 10 }}>{error}</Text>}
 
             <TextInput
@@ -44,8 +46,9 @@ export default function LoginScreen() {
                 onChangeText={setPassword}
             />
 
-            <TouchableOpacity style={authStyles.button} onPress={handleLogin}>
-                <Text style={authStyles.buttonText}>Log In</Text>
+            {/* Updated button to use the bypass function */}
+            <TouchableOpacity style={authStyles.button} onPress={handleBypassLogin}>
+                <Text style={authStyles.buttonText}>Log In (Bypass)</Text>
             </TouchableOpacity>
         </View>
     );
