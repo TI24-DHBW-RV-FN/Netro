@@ -39,6 +39,14 @@ export default function TabLayout() {
                     ),
                 }}
             />
+            {/* Added Calendar Tab according to DoD 2.2.2 */}
+            <Tabs.Screen
+                name="kalender"
+                options={{
+                    title: 'Kalender',
+                    tabBarIcon: ({ color }) => <Ionicons name="calendar" size={28} color={color} />,
+                }}
+            />
         </Tabs>
     );
 }
