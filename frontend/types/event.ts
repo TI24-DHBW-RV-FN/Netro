@@ -1,14 +1,14 @@
-// backend/types/event.ts
 export interface NetroEvent {
     id: number;
     title: string;
     description: string;
     startTime: string;
     location: string;
+    imageUrl?: string; // Neu hinzugefügt für DoD
     seriesEvent: boolean;
     frequency: string | null;
-    createdAt: string;
-    updatedAt: string;
     createdByUserId: number;
     categories: string[];
+    createdAt: string;
+    updatedAt: string;
 }
