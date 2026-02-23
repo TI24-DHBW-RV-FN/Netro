@@ -3,11 +3,9 @@ import { View, Text, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { homeStyles } from "../../constants/styles";
 import { EventCard } from "../../features/event/components/EventCard";
-import { NetroEvent } from "../../types/event"; // Ensure this is exported
+import { NetroEvent } from "../../types/event";
 
-// Variable names in lowerCamelCase
-// Variable names in lowerCamelCase according to Guideline 3
-// Variable names in lowerCamelCase according to guideline 3
+
 const mockEvents: NetroEvent[] = [
     {
         id: 1,
@@ -17,8 +15,8 @@ const mockEvents: NetroEvent[] = [
         location: "Central Park",
         seriesEvent: false,
         frequency: null,
-        createdAt: "2024-02-13T10:30:00.000Z", // Required by interface
-        updatedAt: "2024-02-13T10:30:00.000Z", // Required by interface
+        createdAt: "2024-02-13T10:30:00.000Z",
+        updatedAt: "2024-02-13T10:30:00.000Z",
         createdByUserId: 1,
         categories: ["Sports"]
     },
@@ -32,7 +30,7 @@ export default function HomeLandingPage() {
             </View>
 
             <ScrollView contentContainerStyle={homeStyles.feedContainer}>
-                {/* Comments in English */}
+                {}
                 {mockEvents.map((event) => (
                     <EventCard key={event.id} event={event} />
                 ))}
