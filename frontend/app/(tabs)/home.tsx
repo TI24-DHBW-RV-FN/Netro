@@ -3,9 +3,9 @@ import { View, Text, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { homeStyles } from "../../constants/styles";
 import { EventCard } from "../../features/event/components/EventCard";
-import { NetroEvent } from "../../types/event";
+import { NetroEvent } from "../../types/event"; // Ensure this is exported
 
-// Example data - this would normally come from your 'ladeEventDaten' call
+// Variable names in lowerCamelCase
 const mockEvents: NetroEvent[] = [
     {
         id: 1,
@@ -28,7 +28,7 @@ export default function HomeLandingPage() {
             </View>
 
             <ScrollView contentContainerStyle={homeStyles.feedContainer}>
-                {/* Iterating through events to render cards */}
+                {/* Comments in English */}
                 {mockEvents.map((event) => (
                     <EventCard key={event.id} event={event} />
                 ))}

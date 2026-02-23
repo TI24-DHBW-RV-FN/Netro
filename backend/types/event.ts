@@ -1,4 +1,5 @@
-export interface Event {
+
+export interface NetroEvent {
     id: number;
     title: string;
     description: string;
@@ -6,8 +7,6 @@ export interface Event {
     location: string;
     seriesEvent: boolean;
     frequency: string | null;
-    createdAt: string;
-    updatedAt: string;
     createdByUserId: number;
     categories: string[];
 }

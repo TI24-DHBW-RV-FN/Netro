@@ -1,5 +1,5 @@
 // backend/types/event.ts
-export interface Event {
+export interface NetroEvent {
     id: number;
     title: string;
     description: string;
