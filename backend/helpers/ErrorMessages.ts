@@ -25,6 +25,7 @@ export const ErrorMessages = {
     // Email
     EMAIL_REQUIRED: "Old email and new email are required",
     EMAIL_INCORRECT: "Current email is incorrect",
+    EMAIL_INVALID: "Invalid email format",
 
     // Profile
     NO_FIELDS_PROVIDED: "At least one field must be provided to update",
@@ -39,6 +40,13 @@ export const ErrorMessages = {
     NO_VERIFICATION_TOKEN: "No verification token found. Please request a new one.",
     INVALID_VERIFICATION_TOKEN: "Invalid verification token",
     VERIFICATION_TOKEN_EXPIRED: "Verification token has expired. Please request a new one.",
+
+    // Event
+    EVENT_NOT_FOUND: "Event not found",
+    EVENT_CREATE_FAILED: "Failed to create event",
+    EVENT_UPDATE_FAILED: "Failed to update event",
+    EVENT_FETCH_FAILED: "Failed to retrieve event",
+    NO_PERMISSION_EDIT_EVENT: "You do not have permission to edit this event",
 
     // Generic
     REGISTRATION_FAILED: "Registration failed",

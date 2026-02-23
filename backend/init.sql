@@ -3,7 +3,7 @@
 -- The database is already created by Docker, so we don't need CREATE DATABASE
 SET timezone = 'UTC';
 -- --------------------------------------------------------
--- USER TABLE
+-- USERS TABLE
 -- --------------------------------------------------------
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS category (
 -- Index for faster category name lookups
 CREATE INDEX IF NOT EXISTS idx_category_name ON category(name);
 -- --------------------------------------------------------
--- USER_CATEGORIES (Many-to-Many Junction Table)
+-- USERS_CATEGORIES (Many-to-Many Junction Table)
 -- --------------------------------------------------------
 CREATE TABLE IF NOT EXISTS users_categories (
     users_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -48,8 +48,8 @@ CREATE INDEX IF NOT EXISTS idx_users_categories_category_id ON users_categories(
 -- --------------------------------------------------------
 CREATE TABLE IF NOT EXISTS events (
     id SERIAL PRIMARY KEY,
-    title VARCHAR(100),
-    description VARCHAR(255),
+    title VARCHAR(100) NOT NULL,
+    description VARCHAR(255) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     start_time TIMESTAMP NOT NULL,
@@ -106,7 +106,7 @@ WHERE NOT EXISTS (
 -- --------------------------------------------------------
 -- DATABASE ROLES & PERMISSIONS
 -- --------------------------------------------------------
--- Grant permissions to netro_app users (created by POSTGRES_USER env var)
+-- Grant permissions to netro_app user (created by POSTGRES_USER env var)
 DO $$ BEGIN IF EXISTS (
     SELECT 1
     FROM pg_roles

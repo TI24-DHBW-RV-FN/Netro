@@ -702,5 +702,34 @@ describe("Profile Routes", () => {
             expect(response.body.message).toBe("Failed to update profile");
             expect(mockClient.release).toHaveBeenCalled();
         });
+        it("should return 400 if new email format is invalid", async () => {
+            const response = await request(app).put("/profile/edit/email").set("Authorization", `Bearer ${token}`).send({
+                oldEmail: "old@example.com",
+                newEmail: "not-an-email",
+            });
+
+            expect(response.status).toBe(400);
+            expect(response.body.message).toBe("Invalid email format");
+        });
+
+        it("should return 400 if new email has no domain", async () => {
+            const response = await request(app).put("/profile/edit/email").set("Authorization", `Bearer ${token}`).send({
+                oldEmail: "old@example.com",
+                newEmail: "user@",
+            });
+
+            expect(response.status).toBe(400);
+            expect(response.body.message).toBe("Invalid email format");
+        });
+
+        it("should return 400 if new email has no @ symbol", async () => {
+            const response = await request(app).put("/profile/edit/email").set("Authorization", `Bearer ${token}`).send({
+                oldEmail: "old@example.com",
+                newEmail: "userexample.com",
+            });
+
+            expect(response.status).toBe(400);
+            expect(response.body.message).toBe("Invalid email format");
+        });
     });
 });

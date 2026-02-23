@@ -106,6 +106,11 @@ router.put("/edit/email", authenticateToken, async (req: Request, res: Response)
             return sendError(res, 400, ErrorMessages.EMAIL_REQUIRED);
         }
 
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(newEmail)) {
+            return sendError(res, 400, ErrorMessages.EMAIL_INVALID);
+        }
+
         const userResult = await pool.query("SELECT email FROM users WHERE id = $1", [userId]);
 
         if (userResult.rows.length === 0) {
