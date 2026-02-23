@@ -1,10 +1,23 @@
+import React from 'react';
 import { View, Text, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { homeStyles } from "../../constants/styles";
-import { EventCard } from "../../features/events/components/EventCard";
+import { EventCard } from "../../features/event/components/EventCard";
+import { NetroEvent } from "../../types/event";
+
 // Example data - this would normally come from your 'ladeEventDaten' call
-const mockEvents = [
-    { id: 1, title: "Basketball", startTime: "2026-03-15T18:00:00Z", location: "Park" },
+const mockEvents: NetroEvent[] = [
+    {
+        id: 1,
+        title: "Basketball match",
+        description: "Streetball tournament",
+        startTime: "2026-03-15T18:00:00Z",
+        location: "Central Park",
+        seriesEvent: false,
+        frequency: null,
+        createdByUserId: 1,
+        categories: ["Sports"]
+    },
 ];
 
 export default function HomeLandingPage() {
@@ -15,9 +28,9 @@ export default function HomeLandingPage() {
             </View>
 
             <ScrollView contentContainerStyle={homeStyles.feedContainer}>
-                {/* Rendering the Event Cards */}
-                {mockEvents.map(event => (
-                    <EventCard key={event.id} event={event as any} />
+                {/* Iterating through events to render cards */}
+                {mockEvents.map((event) => (
+                    <EventCard key={event.id} event={event} />
                 ))}
             </ScrollView>
         </SafeAreaView>
