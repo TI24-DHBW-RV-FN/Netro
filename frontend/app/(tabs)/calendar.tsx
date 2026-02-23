@@ -1,41 +1,28 @@
 import React, { useMemo } from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet, View, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { EventCard } from '../../features/event/components/EventCard';
 import { NetroEvent } from '../../types/event';
 
-// Mock data including createdAt/updatedAt to satisfy the interface
+// Example events
 const myEvents: NetroEvent[] = [
     {
         id: 1,
         title: "Basketball match",
-        description: "Tournament",
+        description: "Your match",
         startTime: "2026-03-20T18:00:00Z",
         location: "City Court",
         seriesEvent: false,
         frequency: null,
-        createdByUserId: 1,
+        createdByUserId: 1, // Let's assume this is your ID
         categories: ["Sports"],
-        createdAt: "2024-02-13T10:30:00.000Z",
-        updatedAt: "2024-02-13T10:30:00.000Z"
-    },
-    {
-        id: 2,
-        title: "Coding Workshop",
-        description: "React Native Deep Dive",
-        startTime: "2026-03-15T10:00:00Z", // Earlier date
-        location: "Office",
-        seriesEvent: false,
-        frequency: null,
-        createdByUserId: 1,
-        categories: ["Tech"],
         createdAt: "2024-02-13T10:30:00.000Z",
         updatedAt: "2024-02-13T10:30:00.000Z"
     }
 ];
 
 export default function CalendarPage() {
-    // Requirement: "eigene events nach datum angezeigt werden"
+    // DoD: "eigene events nach datum angezeigt werden"
     const sortedEvents = useMemo(() => {
         return [...myEvents].sort((a, b) =>
             new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
@@ -47,9 +34,8 @@ export default function CalendarPage() {
             <View style={styles.header}>
                 <Text style={styles.headerTitle}>Mein Kalender</Text>
             </View>
-
             <ScrollView contentContainerStyle={styles.listContainer}>
-                {sortedEvents.map((event) => (
+                {sortedEvents.map(event => (
                     <EventCard key={event.id} event={event} />
                 ))}
             </ScrollView>
