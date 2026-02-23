@@ -14,15 +14,15 @@ export function validateRegistrationInput(data: any): { valid: boolean; errors: 
         errors.push("Password must be at least 8 characters long");
     }
 
-    // Optional fields with type checking
-    if (data.userName !== undefined && data.userName !== null) {
-        if (typeof data.userName !== "string") {
-            errors.push("userName must be a string");
-        } else if (data.userName.length > 100) {
-            errors.push("userName must not exceed 100 characters");
-        }
+    if (data.userName === undefined || data.userName === null || typeof data.userName !== "string") {
+        errors.push("userName is required and must be a string");
+    } else if (data.userName.trim() === "") {
+        errors.push("userName cannot be empty or just whitespace");
+    } else if (data.userName.length > 100) {
+        errors.push("userName must not exceed 100 characters");
     }
 
+    // Optional fields with type checking
     if (data.currentLocation !== undefined && data.currentLocation !== null) {
         if (typeof data.currentLocation !== "string") {
             errors.push("currentLocation must be a string");
