@@ -3,10 +3,11 @@ import { validateRegistrationInput } from "./validateRegistrationInput.js";
 
 describe("validateRegistrationInput", () => {
     describe("Email validation", () => {
-        it("should pass with valid email", () => {
+        it("should pass with valid email, password, and userName", () => {
             const result = validateRegistrationInput({
                 email: "test@example.com",
                 password: "password123",
+                userName: "JohnDoe",
             });
 
             expect(result.valid).toBe(true);
@@ -16,6 +17,7 @@ describe("validateRegistrationInput", () => {
         it("should fail when email is missing", () => {
             const result = validateRegistrationInput({
                 password: "password123",
+                userName: "JohnDoe",
             });
 
             expect(result.valid).toBe(false);
@@ -26,6 +28,7 @@ describe("validateRegistrationInput", () => {
             const result = validateRegistrationInput({
                 email: 123,
                 password: "password123",
+                userName: "JohnDoe",
             });
 
             expect(result.valid).toBe(false);
@@ -36,6 +39,7 @@ describe("validateRegistrationInput", () => {
             const result = validateRegistrationInput({
                 email: "invalid-email",
                 password: "password123",
+                userName: "JohnDoe",
             });
 
             expect(result.valid).toBe(false);
@@ -49,6 +53,7 @@ describe("validateRegistrationInput", () => {
                 const result = validateRegistrationInput({
                     email,
                     password: "password123",
+                    userName: "JohnDoe",
                 });
 
                 expect(result.valid).toBe(false);
@@ -62,6 +67,7 @@ describe("validateRegistrationInput", () => {
             const result = validateRegistrationInput({
                 email: "test@example.com",
                 password: "password123",
+                userName: "JohnDoe",
             });
 
             expect(result.valid).toBe(true);
@@ -71,6 +77,7 @@ describe("validateRegistrationInput", () => {
         it("should fail when password is missing", () => {
             const result = validateRegistrationInput({
                 email: "test@example.com",
+                userName: "JohnDoe",
             });
 
             expect(result.valid).toBe(false);
@@ -81,6 +88,7 @@ describe("validateRegistrationInput", () => {
             const result = validateRegistrationInput({
                 email: "test@example.com",
                 password: 12345678,
+                userName: "JohnDoe",
             });
 
             expect(result.valid).toBe(false);
@@ -91,10 +99,89 @@ describe("validateRegistrationInput", () => {
             const result = validateRegistrationInput({
                 email: "test@example.com",
                 password: "short",
+                userName: "JohnDoe",
             });
 
             expect(result.valid).toBe(false);
             expect(result.errors).toContain("Password must be at least 8 characters long");
+        });
+    });
+
+    describe("UserName validation", () => {
+        it("should pass with valid userName", () => {
+            const result = validateRegistrationInput({
+                email: "test@example.com",
+                password: "password123",
+                userName: "JohnDoe",
+            });
+
+            expect(result.valid).toBe(true);
+            expect(result.errors).toEqual([]);
+        });
+
+        it("should fail when userName is missing", () => {
+            const result = validateRegistrationInput({
+                email: "test@example.com",
+                password: "password123",
+            });
+
+            expect(result.valid).toBe(false);
+            expect(result.errors).toContain("userName is required and must be a string");
+        });
+
+        it("should fail when userName is not a string", () => {
+            const result = validateRegistrationInput({
+                email: "test@example.com",
+                password: "password123",
+                userName: 123,
+            });
+
+            expect(result.valid).toBe(false);
+            expect(result.errors).toContain("userName is required and must be a string");
+        });
+
+        it("should fail when userName is empty string", () => {
+            const result = validateRegistrationInput({
+                email: "test@example.com",
+                password: "password123",
+                userName: "",
+            });
+
+            expect(result.valid).toBe(false);
+            expect(result.errors).toContain("userName cannot be empty or just whitespace");
+        });
+
+        it("should fail when userName is only whitespace", () => {
+            const result = validateRegistrationInput({
+                email: "test@example.com",
+                password: "password123",
+                userName: "   ",
+            });
+
+            expect(result.valid).toBe(false);
+            expect(result.errors).toContain("userName cannot be empty or just whitespace");
+        });
+
+        it("should fail when userName exceeds 100 characters", () => {
+            const result = validateRegistrationInput({
+                email: "test@example.com",
+                password: "password123",
+                userName: "a".repeat(101),
+            });
+
+            expect(result.valid).toBe(false);
+            expect(result.errors).toContain("userName must not exceed 100 characters");
+        });
+
+        it("should fail when userName is null", () => {
+            const result = validateRegistrationInput({
+                email: "test@example.com",
+                password: "password123",
+                userName: null,
+            });
+
+            expect(result.valid).toBe(false);
+            expect(result.errors).toContain("userName is required and must be a string");
         });
     });
 
@@ -117,38 +204,18 @@ describe("validateRegistrationInput", () => {
             const result = validateRegistrationInput({
                 email: "test@example.com",
                 password: "password123",
+                userName: "JohnDoe",
             });
 
             expect(result.valid).toBe(true);
             expect(result.errors).toEqual([]);
         });
 
-        it("should fail when userName is not a string", () => {
-            const result = validateRegistrationInput({
-                email: "test@example.com",
-                password: "password123",
-                userName: 123,
-            });
-
-            expect(result.valid).toBe(false);
-            expect(result.errors).toContain("userName must be a string");
-        });
-
-        it("should fail when userName exceeds 100 characters", () => {
-            const result = validateRegistrationInput({
-                email: "test@example.com",
-                password: "password123",
-                userName: "a".repeat(101),
-            });
-
-            expect(result.valid).toBe(false);
-            expect(result.errors).toContain("userName must not exceed 100 characters");
-        });
-
         it("should fail when currentLocation is not a string", () => {
             const result = validateRegistrationInput({
                 email: "test@example.com",
                 password: "password123",
+                userName: "JohnDoe",
                 currentLocation: 123,
             });
 
@@ -160,6 +227,7 @@ describe("validateRegistrationInput", () => {
             const result = validateRegistrationInput({
                 email: "test@example.com",
                 password: "password123",
+                userName: "JohnDoe",
                 currentLocation: "a".repeat(101),
             });
 
@@ -171,6 +239,7 @@ describe("validateRegistrationInput", () => {
             const result = validateRegistrationInput({
                 email: "test@example.com",
                 password: "password123",
+                userName: "JohnDoe",
                 bio: 123,
             });
 
@@ -182,6 +251,7 @@ describe("validateRegistrationInput", () => {
             const result = validateRegistrationInput({
                 email: "test@example.com",
                 password: "password123",
+                userName: "JohnDoe",
                 bio: "a".repeat(101),
             });
 
@@ -189,11 +259,11 @@ describe("validateRegistrationInput", () => {
             expect(result.errors).toContain("bio must not exceed 100 characters");
         });
 
-        it("should pass when optional fields are null", () => {
+        it("should pass when optional fields (except userName) are null", () => {
             const result = validateRegistrationInput({
                 email: "test@example.com",
                 password: "password123",
-                userName: null,
+                userName: "JohnDoe",
                 currentLocation: null,
                 bio: null,
                 categories: null,
@@ -209,6 +279,7 @@ describe("validateRegistrationInput", () => {
             const result = validateRegistrationInput({
                 email: "test@example.com",
                 password: "password123",
+                userName: "JohnDoe",
                 categories: ["basketball", "football", "programming"],
             });
 
@@ -220,6 +291,7 @@ describe("validateRegistrationInput", () => {
             const result = validateRegistrationInput({
                 email: "test@example.com",
                 password: "password123",
+                userName: "JohnDoe",
                 categories: [],
             });
 
@@ -231,6 +303,7 @@ describe("validateRegistrationInput", () => {
             const result = validateRegistrationInput({
                 email: "test@example.com",
                 password: "password123",
+                userName: "JohnDoe",
                 categories: "basketball",
             });
 
@@ -242,6 +315,7 @@ describe("validateRegistrationInput", () => {
             const result = validateRegistrationInput({
                 email: "test@example.com",
                 password: "password123",
+                userName: "JohnDoe",
                 categories: ["basketball", 123, "football"],
             });
 
@@ -255,7 +329,7 @@ describe("validateRegistrationInput", () => {
             const result = validateRegistrationInput({
                 email: "invalid-email",
                 password: "short",
-                userName: 123,
+                userName: "   ",
                 bio: "a".repeat(101),
                 categories: "not-an-array",
             });
@@ -264,9 +338,19 @@ describe("validateRegistrationInput", () => {
             expect(result.errors.length).toBeGreaterThan(1);
             expect(result.errors).toContain("Email must be a valid email address");
             expect(result.errors).toContain("Password must be at least 8 characters long");
-            expect(result.errors).toContain("userName must be a string");
+            expect(result.errors).toContain("userName cannot be empty or just whitespace");
             expect(result.errors).toContain("bio must not exceed 100 characters");
             expect(result.errors).toContain("categories must be an array");
+        });
+
+        it("should return multiple errors when all required fields are missing", () => {
+            const result = validateRegistrationInput({});
+
+            expect(result.valid).toBe(false);
+            expect(result.errors.length).toBe(3);
+            expect(result.errors).toContain("Email is required and must be a string");
+            expect(result.errors).toContain("Password is required and must be a string");
+            expect(result.errors).toContain("userName is required and must be a string");
         });
     });
 });

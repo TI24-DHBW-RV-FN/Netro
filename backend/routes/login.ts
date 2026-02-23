@@ -38,9 +38,9 @@ router.post("/", async (req: Request, res: Response) => {
 
         const categoriesResult = await pool.query(
             `SELECT c.name 
-             FROM categories c
-             INNER JOIN user_categories uc ON c.id = uc.category_id
-             WHERE uc.user_id = $1`,
+             FROM category c
+             INNER JOIN users_categories uc ON c.id = uc.category_id
+             WHERE uc.users_id = $1`,
             [user.id],
         );
 

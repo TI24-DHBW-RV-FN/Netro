@@ -3,10 +3,10 @@ import express from "express";
 import loginRouter from "./routes/login.js";
 import registerRouter from "./routes/register.js";
 import profileRouter from "./routes/profile.js";
-import editRouter from "./routes/edit.js";
+// import editRouter from "./routes/edit.js";
 import categoryRouter from "./routes/category.js";
 import verifyRouter from "./routes/verify.js";
-// import eventRouter from "./routes/event.js";
+import eventRouter from "./routes/event.js";
 import { pool } from "./db.js";
 import swaggerUi from "swagger-ui-express";
 import YAML from "yamljs";
@@ -44,10 +44,10 @@ app.get("/health", async (req, res) => {
 app.use("/register", registerRouter);
 app.use("/login", loginRouter);
 app.use("/profile", profileRouter);
-app.use("/edit", editRouter);
+// app.use("/edit", editRouter);
 app.use("/category", categoryRouter);
 app.use("/verify", verifyRouter);
-// app.use("/event", eventRouter);
+app.use("/event", eventRouter);
 
 // Only start server if this file is run directly (not imported in tests)
 if (import.meta.main) {

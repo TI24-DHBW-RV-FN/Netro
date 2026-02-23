@@ -157,7 +157,7 @@ describe("sendEmail", () => {
         expect(html).toContain("<head>");
         expect(html).toContain("<body>");
         expect(html).toContain("</html>");
-        expect(html).toContain("Pleasy verify");
+        expect(html).toContain("Please verify");
     });
 
     it("should handle different verification code formats", async () => {

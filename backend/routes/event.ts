@@ -2,36 +2,32 @@ import { Router, Request, Response } from "express";
 import { pool } from "../db.js";
 import { authenticateToken } from "../token/authenticateToken.js";
 import { ErrorMessages, sendError, sendSuccess } from "../helpers/ErrorMessages.js";
+import { validateEventInput } from "../helpers/validateEventInput.js";
 
 const router = Router();
 
 router.post("/create", authenticateToken, async (req: Request, res: Response) => {
+    const client = await pool.connect();
     try {
         const userId = (req as any).user.userId;
         const { title, description, startTime, location, seriesEvent, frequency, categories } = req.body;
 
-        const errors: string[] = [];
-        if (!title) errors.push("Title is required");
-        if (!description) errors.push("Description is required");
-        if (!startTime) errors.push("Start time is required");
-        if (!location) errors.push("Location is required");
-
-        if (errors.length > 0) {
-            return sendError(res, 400, ErrorMessages.VALIDATION_FAILED, errors);
+        const validation = validateEventInput(req.body, "create");
+        if (!validation.valid) {
+            return sendError(res, 400, ErrorMessages.VALIDATION_FAILED, validation.errors);
         }
 
         const startTimeDate = new Date(startTime);
-        if (isNaN(startTimeDate.getTime())) {
-            return sendError(res, 400, ErrorMessages.VALIDATION_FAILED, ["Invalid start time format"]);
-        }
 
-        const userResult = await pool.query(`SELECT id FROM users WHERE id = $1`, [userId]);
+        const userResult = await client.query(`SELECT id FROM users WHERE id = $1`, [userId]);
 
         if (userResult.rows.length === 0) {
             return sendError(res, 404, ErrorMessages.USER_NOT_FOUND);
         }
 
-        const eventResult = await pool.query(
+        await client.query("BEGIN");
+
+        const eventResult = await client.query(
             `INSERT INTO events (
                 title, 
                 description, 
@@ -42,10 +38,30 @@ router.post("/create", authenticateToken, async (req: Request, res: Response) =>
                 created_by_user_id
             ) VALUES ($1, $2, $3, $4, $5, $6, $7)
             RETURNING id, title, description, start_time, location, series_event, frequency, created_at, updated_at, created_by_user_id`,
-            [title, description, startTimeDate, location, seriesEvent || false, (seriesEvent ? frequency : null) || null, userId],
+            [title, description, startTimeDate, location, seriesEvent || false, seriesEvent ? frequency || null : null, userId],
         );
 
         const eventData = eventResult.rows[0];
+
+        let eventCategories: string[] = [];
+        if (categories && Array.isArray(categories) && categories.length > 0) {
+            const validCategoriesResult = await client.query(`SELECT id, name FROM category WHERE name = ANY($1::text[])`, [categories]);
+
+            const validCategoryNames = validCategoriesResult.rows.map((cat: any) => cat.name);
+            const invalidCategories = categories.filter((cat: string) => !validCategoryNames.includes(cat));
+
+            if (invalidCategories.length > 0) {
+                await client.query("ROLLBACK");
+                return sendError(res, 400, ErrorMessages.INVALID_CATEGORIES, undefined, invalidCategories);
+            }
+
+            const categoryIds = validCategoriesResult.rows.map((cat: any) => cat.id);
+            await client.query(`INSERT INTO events_categories (events_id, category_id) SELECT $1, unnest($2::int[])`, [eventData.id, categoryIds]);
+
+            eventCategories = validCategoryNames;
+        }
+
+        await client.query("COMMIT");
 
         console.log("✅ Event created successfully:", {
             eventId: eventData.id,
@@ -53,23 +69,6 @@ router.post("/create", authenticateToken, async (req: Request, res: Response) =>
             createdBy: userId,
             startTime: eventData.start_time,
         });
-
-        if (categories && Array.isArray(categories) && categories.length > 0) {
-            const validCategoriesResult = await pool.query(`SELECT id, name FROM category WHERE name = ANY($1::text[])`, [categories]);
-
-            const validCategoryNames = validCategoriesResult.rows.map((cat: any) => cat.name);
-            const invalidCategories = categories.filter((cat: string) => !validCategoryNames.includes(cat));
-
-            if (invalidCategories.length > 0) {
-                await pool.query(`DELETE FROM events WHERE id = $1`, [eventData.id]);
-                return sendError(res, 400, ErrorMessages.INVALID_CATEGORIES, undefined, invalidCategories);
-            }
-
-            const categoryIds = validCategoriesResult.rows.map((cat: any) => cat.id);
-            for (const categoryId of categoryIds) {
-                await pool.query(`INSERT INTO events_categories (events_id, category_id) VALUES ($1, $2)`, [eventData.id, categoryId]);
-            }
-        }
 
         return sendSuccess(res, 201, "Event created successfully", {
             event: {
@@ -83,16 +82,20 @@ router.post("/create", authenticateToken, async (req: Request, res: Response) =>
                 createdAt: eventData.created_at,
                 updatedAt: eventData.updated_at,
                 createdByUserId: eventData.created_by_user_id,
-                categories: categories || [],
+                categories: eventCategories,
             },
         });
     } catch (error) {
+        await client.query("ROLLBACK");
         console.error("Event creation error:", error);
-        return sendError(res, 500, "Failed to create event");
+        return sendError(res, 500, ErrorMessages.EVENT_CREATE_FAILED);
+    } finally {
+        client.release();
     }
 });
 
 router.put("/edit", authenticateToken, async (req: Request, res: Response) => {
+    const client = await pool.connect();
     try {
         const userId = (req as any).user.userId;
         const { eventId, title, description, startTime, location, seriesEvent, frequency, categories } = req.body;
@@ -101,20 +104,31 @@ router.put("/edit", authenticateToken, async (req: Request, res: Response) => {
             return sendError(res, 400, ErrorMessages.VALIDATION_FAILED, ["Event ID is required"]);
         }
 
-        const eventCheckResult = await pool.query(`SELECT id, created_by_user_id FROM events WHERE id = $1`, [eventId]);
+        const eventCheckResult = await client.query(`SELECT id, created_by_user_id FROM events WHERE id = $1`, [eventId]);
 
         if (eventCheckResult.rows.length === 0) {
-            return sendError(res, 404, "Event not found");
+            return sendError(res, 404, ErrorMessages.EVENT_NOT_FOUND);
         }
 
         const existingEvent = eventCheckResult.rows[0];
         if (existingEvent.created_by_user_id !== userId) {
-            return sendError(res, 403, "You do not have permission to edit this event");
+            return sendError(res, 403, ErrorMessages.NO_PERMISSION_EDIT_EVENT);
         }
 
         if (!title && !description && !startTime && !location && seriesEvent === undefined && !frequency && !categories) {
             return sendError(res, 400, ErrorMessages.NO_FIELDS_PROVIDED);
         }
+
+        const validation = validateEventInput(req.body, "edit");
+        if (!validation.valid) {
+            return sendError(res, 400, ErrorMessages.VALIDATION_FAILED, validation.errors);
+        }
+
+        if (categories !== undefined && !Array.isArray(categories)) {
+            return sendError(res, 400, ErrorMessages.VALIDATION_FAILED, ["Categories must be an array"]);
+        }
+
+        await client.query("BEGIN");
 
         const updates: string[] = [];
         const values: any[] = [];
@@ -131,12 +145,8 @@ router.put("/edit", authenticateToken, async (req: Request, res: Response) => {
         }
 
         if (startTime !== undefined) {
-            const startTimeDate = new Date(startTime);
-            if (isNaN(startTimeDate.getTime())) {
-                return sendError(res, 400, ErrorMessages.VALIDATION_FAILED, ["Invalid start time format"]);
-            }
             updates.push(`start_time = $${paramCount++}`);
-            values.push(startTimeDate);
+            values.push(new Date(startTime));
         }
 
         if (location !== undefined) {
@@ -160,7 +170,6 @@ router.put("/edit", authenticateToken, async (req: Request, res: Response) => {
         }
 
         updates.push(`updated_at = CURRENT_TIMESTAMP`);
-
         values.push(eventId);
 
         let eventData;
@@ -172,10 +181,10 @@ router.put("/edit", authenticateToken, async (req: Request, res: Response) => {
                 RETURNING id, title, description, start_time, location, series_event, frequency, created_at, updated_at, created_by_user_id
             `;
 
-            const eventResult = await pool.query(updateQuery, values);
+            const eventResult = await client.query(updateQuery, values);
             eventData = eventResult.rows[0];
         } else {
-            const eventResult = await pool.query(
+            const eventResult = await client.query(
                 `SELECT id, title, description, start_time, location, series_event, frequency, created_at, updated_at, created_by_user_id
                 FROM events WHERE id = $1`,
                 [eventId],
@@ -185,31 +194,26 @@ router.put("/edit", authenticateToken, async (req: Request, res: Response) => {
 
         let eventCategories: string[] = [];
         if (categories !== undefined) {
-            if (Array.isArray(categories)) {
-                await pool.query(`DELETE FROM events_categories WHERE events_id = $1`, [eventId]);
+            await client.query(`DELETE FROM events_categories WHERE events_id = $1`, [eventId]);
 
-                if (categories.length > 0) {
-                    const validCategoriesResult = await pool.query(`SELECT id, name FROM category WHERE name = ANY($1::text[])`, [categories]);
+            if (categories.length > 0) {
+                const validCategoriesResult = await client.query(`SELECT id, name FROM category WHERE name = ANY($1::text[])`, [categories]);
 
-                    const validCategoryNames = validCategoriesResult.rows.map((cat: any) => cat.name);
-                    const invalidCategories = categories.filter((cat: string) => !validCategoryNames.includes(cat));
+                const validCategoryNames = validCategoriesResult.rows.map((cat: any) => cat.name);
+                const invalidCategories = categories.filter((cat: string) => !validCategoryNames.includes(cat));
 
-                    if (invalidCategories.length > 0) {
-                        return sendError(res, 400, ErrorMessages.INVALID_CATEGORIES, undefined, invalidCategories);
-                    }
-
-                    const categoryIds = validCategoriesResult.rows.map((cat: any) => cat.id);
-                    for (const categoryId of categoryIds) {
-                        await pool.query(`INSERT INTO events_categories (events_id, category_id) VALUES ($1, $2)`, [eventId, categoryId]);
-                    }
-
-                    eventCategories = validCategoryNames;
+                if (invalidCategories.length > 0) {
+                    await client.query("ROLLBACK");
+                    return sendError(res, 400, ErrorMessages.INVALID_CATEGORIES, undefined, invalidCategories);
                 }
-            } else {
-                return sendError(res, 400, ErrorMessages.VALIDATION_FAILED, ["Categories must be an array"]);
+
+                const categoryIds = validCategoriesResult.rows.map((cat: any) => cat.id);
+                await client.query(`INSERT INTO events_categories (events_id, category_id) SELECT $1, unnest($2::int[])`, [eventId, categoryIds]);
+
+                eventCategories = validCategoryNames;
             }
         } else {
-            const existingCategoriesResult = await pool.query(
+            const existingCategoriesResult = await client.query(
                 `SELECT c.name FROM category c
                 INNER JOIN events_categories ec ON c.id = ec.category_id
                 WHERE ec.events_id = $1`,
@@ -217,6 +221,8 @@ router.put("/edit", authenticateToken, async (req: Request, res: Response) => {
             );
             eventCategories = existingCategoriesResult.rows.map((cat: any) => cat.name);
         }
+
+        await client.query("COMMIT");
 
         console.log("✅ Event updated successfully:", {
             eventId: eventData.id,
@@ -240,8 +246,11 @@ router.put("/edit", authenticateToken, async (req: Request, res: Response) => {
             },
         });
     } catch (error) {
+        await client.query("ROLLBACK");
         console.error("Event update error:", error);
-        return sendError(res, 500, "Failed to update event");
+        return sendError(res, 500, ErrorMessages.EVENT_UPDATE_FAILED);
+    } finally {
+        client.release();
     }
 });
 
@@ -260,7 +269,7 @@ router.post("/info", authenticateToken, async (req: Request, res: Response) => {
         );
 
         if (eventResult.rows.length === 0) {
-            return sendError(res, 404, "Event not found");
+            return sendError(res, 404, ErrorMessages.EVENT_NOT_FOUND);
         }
 
         const eventData = eventResult.rows[0];
@@ -291,7 +300,7 @@ router.post("/info", authenticateToken, async (req: Request, res: Response) => {
         });
     } catch (error) {
         console.error("Event info error:", error);
-        return sendError(res, 500, "Failed to retrieve event");
+        return sendError(res, 500, ErrorMessages.EVENT_FETCH_FAILED);
     }
 });
 

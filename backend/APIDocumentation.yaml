@@ -35,6 +35,8 @@ tags:
     description: Category management
   - name: Verification
     description: Email verification
+  - name: Events
+    description: Event creation and management
 
 paths:
   /health:
@@ -225,7 +227,7 @@ paths:
                 success: false
                 message: Login failed
 
-  /profile:
+  /profile/info:
     get:
       tags:
         - Profile
@@ -274,8 +276,8 @@ paths:
                 success: false
                 message: Failed to fetch user profile
 
-  /edit/profile:
-    post:
+  /profile/edit/info:
+    put:
       tags:
         - Profile
       summary: Update user profile
@@ -357,8 +359,8 @@ paths:
                 success: false
                 message: Failed to update profile
 
-  /edit/password:
-    post:
+  /profile/edit/password:
+    put:
       tags:
         - Profile
       summary: Change password
@@ -445,8 +447,8 @@ paths:
                 success: false
                 message: Failed to update password
 
-  /edit/email:
-    post:
+  /profile/edit/email:
+    put:
       tags:
         - Profile
       summary: Change email address
@@ -921,68 +923,7 @@ paths:
               example:
                 success: false
                 message: Failed to update event
-  /event/info:
-    post:
-      tags:
-        - Events
-      summary: Get event info
-      description: Retrieve all information for a specific event, including its categories.
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - eventId
-              properties:
-                eventId:
-                  type: integer
-                  description: ID of the event to retrieve
-                  example: 1
-      responses:
-        '200':
-          description: Event retrieved successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EventInfoSuccessResponse'
-        '400':
-          description: Validation failed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ValidationError'
-              example:
-                success: false
-                message: Validation failed
-                errors: ["Event ID is required"]
-        '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-        '404':
-          description: Event not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              example:
-                success: false
-                message: Event not found
-        '500':
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-              example:
-                success: false
-                message: Request failed
+
 components:
   securitySchemes:
     bearerAuth:
@@ -1135,6 +1076,50 @@ components:
           type: string
           example: basketball
 
+    # Event schemas
+    Event:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: Basketball Game
+        description:
+          type: string
+          example: Friendly basketball match at the park
+        startTime:
+          type: string
+          format: date-time
+          example: '2026-03-15T18:00:00.000Z'
+        location:
+          type: string
+          example: Central Park
+        seriesEvent:
+          type: boolean
+          example: true
+        frequency:
+          type: string
+          nullable: true
+          example: weekly
+        createdAt:
+          type: string
+          format: date-time
+          example: '2024-02-13T10:30:00.000Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2024-02-13T10:30:00.000Z'
+        createdByUserId:
+          type: integer
+          example: 1
+        categories:
+          type: array
+          items:
+            type: string
+          example: ["basketball", "gaming"]
+
     # Success response schemas
     RegistrationSuccessResponse:
       allOf:
@@ -1237,3 +1222,19 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/Category'
+
+    EventCreateSuccessResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            event:
+              $ref: '#/components/schemas/Event'
+
+    EventUpdateSuccessResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            event:
+              $ref: '#/components/schemas/Event'

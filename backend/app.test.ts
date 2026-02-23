@@ -56,7 +56,7 @@ describe("Express App", () => {
     });
 
     it("should have profile route mounted", async () => {
-        const response = await request(app).get("/profile");
+        const response = await request(app).get("/profile/info");
 
         expect(response.status).not.toBe(404);
         expect(response.status).toBe(401);
