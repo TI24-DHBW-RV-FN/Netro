@@ -924,6 +924,93 @@ paths:
                 success: false
                 message: Failed to update event
 
+  /event/info:
+    post:
+      tags:
+        - Events
+      summary: Get event information
+      description: Retrieve detailed information about a specific event, including its categories. Authentication is required.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - eventId
+              properties:
+                eventId:
+                  type: integer
+                  description: ID of the event to retrieve
+                  example: 1
+      responses:
+        '200':
+          description: Event retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventInfoSuccessResponse'
+              example:
+                success: true
+                message: Event retrieved successfully
+                event:
+                  id: 1
+                  title: Basketball Game
+                  description: Friendly basketball match at the park
+                  startTime: '2026-03-15T18:00:00.000Z'
+                  location: Central Park
+                  seriesEvent: true
+                  frequency: weekly
+                  createdAt: '2024-02-13T10:30:00.000Z'
+                  updatedAt: '2024-02-13T10:30:00.000Z'
+                  createdByUserId: 1
+                  categories: ["basketball", "gaming"]
+        '400':
+          description: Event ID is missing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+              example:
+                success: false
+                message: Validation failed
+                errors: ["Event ID is required"]
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                noToken:
+                  value:
+                    success: false
+                    message: Access token is required
+                invalidToken:
+                  value:
+                    success: false
+                    message: Invalid or expired token
+        '404':
+          description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: Event not found
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: Failed to fetch event
+
 components:
   securitySchemes:
     bearerAuth:
@@ -1232,6 +1319,14 @@ components:
               $ref: '#/components/schemas/Event'
 
     EventUpdateSuccessResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            event:
+              $ref: '#/components/schemas/Event'
+
+    EventInfoSuccessResponse:
       allOf:
         - $ref: '#/components/schemas/SuccessResponse'
         - type: object
