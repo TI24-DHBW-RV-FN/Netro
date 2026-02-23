@@ -28,7 +28,7 @@ vi.mock("../token/authenticateToken.js", () => ({
 
 const app = express();
 app.use(express.json());
-app.use("/events", eventRouter);
+app.use("/event", eventRouter);
 
 const JWT_SECRET = "test-secret";
 
@@ -50,7 +50,7 @@ describe("Event Routes", () => {
         vi.clearAllMocks();
     });
 
-    describe("POST /events/create", () => {
+    describe("POST /event/create", () => {
         const token = generateToken(1);
 
         it("should successfully create an event without categories", async () => {
@@ -73,7 +73,7 @@ describe("Event Routes", () => {
                 .mockResolvedValueOnce({ rows: [mockEvent] } as any) // INSERT event
                 .mockResolvedValueOnce({ rows: [] } as any); // COMMIT
 
-            const response = await request(app).post("/events/create").set("Authorization", `Bearer ${token}`).send({
+            const response = await request(app).post("/event/create").set("Authorization", `Bearer ${token}`).send({
                 title: "Team Meeting",
                 description: "Weekly team sync",
                 startTime: "2026-03-01T10:00:00Z",
@@ -109,7 +109,7 @@ describe("Event Routes", () => {
                 .mockResolvedValueOnce({ rows: [mockEvent] } as any) // INSERT event
                 .mockResolvedValueOnce({ rows: [] } as any); // COMMIT
 
-            const response = await request(app).post("/events/create").set("Authorization", `Bearer ${token}`).send({
+            const response = await request(app).post("/event/create").set("Authorization", `Bearer ${token}`).send({
                 title: "Daily Standup",
                 description: "Daily team standup",
                 startTime: "2026-03-01T09:00:00Z",
@@ -152,7 +152,7 @@ describe("Event Routes", () => {
                 .mockResolvedValueOnce({ rows: [] } as any); // COMMIT
 
             const response = await request(app)
-                .post("/events/create")
+                .post("/event/create")
                 .set("Authorization", `Bearer ${token}`)
                 .send({
                     title: "Basketball Game",
@@ -168,7 +168,7 @@ describe("Event Routes", () => {
         });
 
         it("should return 400 if title is missing", async () => {
-            const response = await request(app).post("/events/create").set("Authorization", `Bearer ${token}`).send({
+            const response = await request(app).post("/event/create").set("Authorization", `Bearer ${token}`).send({
                 description: "Test description",
                 startTime: "2026-03-01T10:00:00Z",
                 location: "Test location",
@@ -180,7 +180,7 @@ describe("Event Routes", () => {
         });
 
         it("should return 400 if description is missing", async () => {
-            const response = await request(app).post("/events/create").set("Authorization", `Bearer ${token}`).send({
+            const response = await request(app).post("/event/create").set("Authorization", `Bearer ${token}`).send({
                 title: "Test Event",
                 startTime: "2026-03-01T10:00:00Z",
                 location: "Test location",
@@ -191,7 +191,7 @@ describe("Event Routes", () => {
         });
 
         it("should return 400 if startTime is missing", async () => {
-            const response = await request(app).post("/events/create").set("Authorization", `Bearer ${token}`).send({
+            const response = await request(app).post("/event/create").set("Authorization", `Bearer ${token}`).send({
                 title: "Test Event",
                 description: "Test description",
                 location: "Test location",
@@ -202,7 +202,7 @@ describe("Event Routes", () => {
         });
 
         it("should return 400 if location is missing", async () => {
-            const response = await request(app).post("/events/create").set("Authorization", `Bearer ${token}`).send({
+            const response = await request(app).post("/event/create").set("Authorization", `Bearer ${token}`).send({
                 title: "Test Event",
                 description: "Test description",
                 startTime: "2026-03-01T10:00:00Z",
@@ -213,7 +213,7 @@ describe("Event Routes", () => {
         });
 
         it("should return 400 for invalid start time format", async () => {
-            const response = await request(app).post("/events/create").set("Authorization", `Bearer ${token}`).send({
+            const response = await request(app).post("/event/create").set("Authorization", `Bearer ${token}`).send({
                 title: "Test Event",
                 description: "Test description",
                 startTime: "invalid-date",
@@ -227,7 +227,7 @@ describe("Event Routes", () => {
         it("should return 404 if user not found", async () => {
             mockClient.query.mockResolvedValueOnce({ rows: [] } as any); // User check returns empty
 
-            const response = await request(app).post("/events/create").set("Authorization", `Bearer ${token}`).send({
+            const response = await request(app).post("/event/create").set("Authorization", `Bearer ${token}`).send({
                 title: "Test Event",
                 description: "Test description",
                 startTime: "2026-03-01T10:00:00Z",
@@ -262,7 +262,7 @@ describe("Event Routes", () => {
                 .mockResolvedValueOnce({ rows: [] } as any); // ROLLBACK
 
             const response = await request(app)
-                .post("/events/create")
+                .post("/event/create")
                 .set("Authorization", `Bearer ${token}`)
                 .send({
                     title: "Test Event",
@@ -282,7 +282,7 @@ describe("Event Routes", () => {
         it("should return 500 on database error", async () => {
             mockClient.query.mockRejectedValueOnce(new Error("Database error")); // User check throws
 
-            const response = await request(app).post("/events/create").set("Authorization", `Bearer ${token}`).send({
+            const response = await request(app).post("/event/create").set("Authorization", `Bearer ${token}`).send({
                 title: "Test Event",
                 description: "Test description",
                 startTime: "2026-03-01T10:00:00Z",
@@ -295,7 +295,7 @@ describe("Event Routes", () => {
         });
     });
 
-    describe("PUT /events/edit", () => {
+    describe("PUT /event/edit", () => {
         const token = generateToken(1);
 
         it("should successfully update an event with all fields", async () => {
@@ -322,7 +322,7 @@ describe("Event Routes", () => {
                 .mockResolvedValueOnce({ rows: [] } as any); // COMMIT
 
             const response = await request(app)
-                .put("/events/edit")
+                .put("/event/edit")
                 .set("Authorization", `Bearer ${token}`)
                 .send({
                     eventId: 1,
@@ -363,7 +363,7 @@ describe("Event Routes", () => {
                 .mockResolvedValueOnce({ rows: [{ name: "sports" }] } as any) // Get existing categories
                 .mockResolvedValueOnce({ rows: [] } as any); // COMMIT
 
-            const response = await request(app).put("/events/edit").set("Authorization", `Bearer ${token}`).send({
+            const response = await request(app).put("/event/edit").set("Authorization", `Bearer ${token}`).send({
                 eventId: 1,
                 title: "New Title",
             });
@@ -374,7 +374,7 @@ describe("Event Routes", () => {
         });
 
         it("should return 400 if eventId is missing", async () => {
-            const response = await request(app).put("/events/edit").set("Authorization", `Bearer ${token}`).send({
+            const response = await request(app).put("/event/edit").set("Authorization", `Bearer ${token}`).send({
                 title: "New Title",
             });
 
@@ -385,7 +385,7 @@ describe("Event Routes", () => {
         it("should return 404 if event not found", async () => {
             mockClient.query.mockResolvedValueOnce({ rows: [] } as any);
 
-            const response = await request(app).put("/events/edit").set("Authorization", `Bearer ${token}`).send({
+            const response = await request(app).put("/event/edit").set("Authorization", `Bearer ${token}`).send({
                 eventId: 999,
                 title: "New Title",
             });
@@ -399,7 +399,7 @@ describe("Event Routes", () => {
                 rows: [{ id: 1, created_by_user_id: 999 }],
             } as any);
 
-            const response = await request(app).put("/events/edit").set("Authorization", `Bearer ${token}`).send({
+            const response = await request(app).put("/event/edit").set("Authorization", `Bearer ${token}`).send({
                 eventId: 1,
                 title: "New Title",
             });
@@ -413,7 +413,7 @@ describe("Event Routes", () => {
                 rows: [{ id: 1, created_by_user_id: 1 }],
             } as any);
 
-            const response = await request(app).put("/events/edit").set("Authorization", `Bearer ${token}`).send({
+            const response = await request(app).put("/event/edit").set("Authorization", `Bearer ${token}`).send({
                 eventId: 1,
             });
 
@@ -426,7 +426,7 @@ describe("Event Routes", () => {
                 rows: [{ id: 1, created_by_user_id: 1 }],
             } as any);
 
-            const response = await request(app).put("/events/edit").set("Authorization", `Bearer ${token}`).send({
+            const response = await request(app).put("/event/edit").set("Authorization", `Bearer ${token}`).send({
                 eventId: 1,
                 startTime: "invalid-date",
             });
@@ -456,7 +456,7 @@ describe("Event Routes", () => {
                 .mockResolvedValueOnce({ rows: [] } as any) // Get existing categories
                 .mockResolvedValueOnce({ rows: [] } as any); // COMMIT
 
-            const response = await request(app).put("/events/edit").set("Authorization", `Bearer ${token}`).send({
+            const response = await request(app).put("/event/edit").set("Authorization", `Bearer ${token}`).send({
                 eventId: 1,
                 seriesEvent: false,
             });
@@ -496,7 +496,7 @@ describe("Event Routes", () => {
                 .mockResolvedValueOnce({ rows: [] } as any); // COMMIT
 
             const response = await request(app)
-                .put("/events/edit")
+                .put("/event/edit")
                 .set("Authorization", `Bearer ${token}`)
                 .send({
                     eventId: 1,
@@ -528,7 +528,7 @@ describe("Event Routes", () => {
                 .mockResolvedValueOnce({ rows: [] } as any) // Delete categories
                 .mockResolvedValueOnce({ rows: [] } as any); // COMMIT
 
-            const response = await request(app).put("/events/edit").set("Authorization", `Bearer ${token}`).send({
+            const response = await request(app).put("/event/edit").set("Authorization", `Bearer ${token}`).send({
                 eventId: 1,
                 categories: [],
             });
@@ -542,7 +542,7 @@ describe("Event Routes", () => {
                 rows: [{ id: 1, created_by_user_id: 1 }],
             } as any);
 
-            const response = await request(app).put("/events/edit").set("Authorization", `Bearer ${token}`).send({
+            const response = await request(app).put("/event/edit").set("Authorization", `Bearer ${token}`).send({
                 eventId: 1,
                 categories: "not-an-array",
             });
@@ -574,7 +574,7 @@ describe("Event Routes", () => {
                 .mockResolvedValueOnce({ rows: [] } as any); // ROLLBACK
 
             const response = await request(app)
-                .put("/events/edit")
+                .put("/event/edit")
                 .set("Authorization", `Bearer ${token}`)
                 .send({
                     eventId: 1,
@@ -591,7 +591,7 @@ describe("Event Routes", () => {
         it("should return 500 on database error and rollback", async () => {
             mockClient.query.mockRejectedValueOnce(new Error("Database error"));
 
-            const response = await request(app).put("/events/edit").set("Authorization", `Bearer ${token}`).send({
+            const response = await request(app).put("/event/edit").set("Authorization", `Bearer ${token}`).send({
                 eventId: 1,
                 title: "New Title",
             });
@@ -602,7 +602,7 @@ describe("Event Routes", () => {
         });
     });
 
-    describe("POST /events/info", () => {
+    describe("POST /event/info", () => {
         const token = generateToken(1);
 
         it("should successfully return event info with categories", async () => {
@@ -625,7 +625,7 @@ describe("Event Routes", () => {
                     rows: [{ name: "basketball" }, { name: "football" }],
                 } as any);
 
-            const response = await request(app).post("/events/info").set("Authorization", `Bearer ${token}`).send({ eventId: 1 });
+            const response = await request(app).post("/event/info").set("Authorization", `Bearer ${token}`).send({ eventId: 1 });
 
             expect(response.status).toBe(200);
             expect(response.body.success).toBe(true);
@@ -656,7 +656,7 @@ describe("Event Routes", () => {
                 .mockResolvedValueOnce({ rows: [mockEvent] } as any)
                 .mockResolvedValueOnce({ rows: [] } as any);
 
-            const response = await request(app).post("/events/info").set("Authorization", `Bearer ${token}`).send({ eventId: 2 });
+            const response = await request(app).post("/event/info").set("Authorization", `Bearer ${token}`).send({ eventId: 2 });
 
             expect(response.status).toBe(200);
             expect(response.body.event.categories).toEqual([]);
@@ -665,7 +665,7 @@ describe("Event Routes", () => {
         });
 
         it("should return 400 if eventId is missing", async () => {
-            const response = await request(app).post("/events/info").set("Authorization", `Bearer ${token}`).send({});
+            const response = await request(app).post("/event/info").set("Authorization", `Bearer ${token}`).send({});
 
             expect(response.status).toBe(400);
             expect(response.body.success).toBe(false);
@@ -675,7 +675,7 @@ describe("Event Routes", () => {
         it("should return 404 if event not found", async () => {
             vi.mocked(pool.query).mockResolvedValueOnce({ rows: [] } as any);
 
-            const response = await request(app).post("/events/info").set("Authorization", `Bearer ${token}`).send({ eventId: 999 });
+            const response = await request(app).post("/event/info").set("Authorization", `Bearer ${token}`).send({ eventId: 999 });
 
             expect(response.status).toBe(404);
             expect(response.body.success).toBe(false);
@@ -685,7 +685,7 @@ describe("Event Routes", () => {
         it("should return 500 on database error", async () => {
             vi.mocked(pool.query).mockRejectedValueOnce(new Error("Database error"));
 
-            const response = await request(app).post("/events/info").set("Authorization", `Bearer ${token}`).send({ eventId: 1 });
+            const response = await request(app).post("/event/info").set("Authorization", `Bearer ${token}`).send({ eventId: 1 });
 
             expect(response.status).toBe(500);
             expect(response.body.success).toBe(false);

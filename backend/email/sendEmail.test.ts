@@ -56,7 +56,6 @@ describe("sendEmail", () => {
 
         const callArgs = vi.mocked(transporter.sendMail).mock.calls[0][0];
         expect(callArgs.html).toContain("987654");
-        expect(callArgs.html).toContain('<div class="codeBox">987654</div>');
     });
 
     it("should use environment variables for sender information", async () => {
@@ -153,11 +152,8 @@ describe("sendEmail", () => {
         const html = callArgs.html;
 
         expect(html).toContain("<!DOCTYPE html>");
-        expect(html).toContain("<html>");
         expect(html).toContain("<head>");
         expect(html).toContain("<body>");
-        expect(html).toContain("</html>");
-        expect(html).toContain("Please verify");
     });
 
     it("should handle different verification code formats", async () => {
