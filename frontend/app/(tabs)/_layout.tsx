@@ -1,6 +1,7 @@
 import React from "react";
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'react-native';
 
 export default function TabLayout() {
     return (
@@ -25,6 +26,24 @@ export default function TabLayout() {
                     tabBarIcon: ({ color }) => <Ionicons name="person" size={28} color={color} />,
                 }}
             />
+
+            <Tabs.Screen
+                name="home"
+                options={{
+                    title: 'Home',
+                    tabBarIcon: ({ color, size }) => (
+                        <Image
+                            source={require('../../assets/netro-icon.png')}
+                            style={{
+                                width: size,
+                                height: size,
+                                tintColor: color
+                            }}
+                        />
+                    ),
+                }}
+            />
+
         </Tabs>
     );
 }
