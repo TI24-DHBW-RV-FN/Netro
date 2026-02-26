@@ -12,7 +12,7 @@ export default function TabLayout() {
         }}>
             {/* Requirement: Reiter (Kalender) in der Navbar */}
             <Tabs.Screen
-                name="kalender"
+                name="Calendar"
                 options={{
                     title: 'Kalender',
                     tabBarIcon: ({ color }) => <Ionicons name="calendar" size={28} color={color} />,
