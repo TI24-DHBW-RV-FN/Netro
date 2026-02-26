@@ -32,7 +32,7 @@ export default function CalendarPage() {
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.headerTitle}>Mein Kalender</Text>
+                <Text style={styles.headerTitle}>My Calendar</Text>
             </View>
             <ScrollView contentContainerStyle={styles.listContainer}>
                 {sortedEvents.map(event => (
