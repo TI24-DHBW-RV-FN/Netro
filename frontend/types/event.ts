@@ -4,7 +4,7 @@ export interface NetroEvent {
     description: string;
     startTime: string;
     location: string;
-    imageUrl?: string; // Neu hinzugefügt für DoD
+    imageUrl?: string;
     seriesEvent: boolean;
     frequency: string | null;
     createdByUserId: number;
