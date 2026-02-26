@@ -7,20 +7,15 @@ export default function EventDetailScreen() {
     const { id } = useLocalSearchParams();
     const [event, setEvent] = useState<NetroEvent | null>(null);
     const [isLoading, setIsLoading] = useState(true);
-
-    // TODO remove Mocked current user ID for development
     const currentUserId = 1;
 
     useEffect(() => {
-        // DoD Requirement: Navigation triggers "ladeEventDaten"
-        const ladeEventDaten = async () => {
+        // DoD Requirement: Navigation triggers "loadEventData"
+        const loadEventData = async () => {
             try {
                 setIsLoading(true);
-                // Simulation of backend call
                 console.log(`Triggering ladeEventDaten for ID: ${id}`);
 
-                // For now, we simulate fetching the mock event
-                // In production, this would be: await api.getEvent(id)
                 setTimeout(() => {
                     const mockFetchedEvent: NetroEvent = {
                         id: Number(id),
@@ -44,7 +39,7 @@ export default function EventDetailScreen() {
             }
         };
 
-        ladeEventDaten();
+        loadEventData();
     }, [id]);
 
     if (isLoading) return <ActivityIndicator style={styles.container} color="#8A2BE2" />;
