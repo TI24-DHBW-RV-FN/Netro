@@ -23,7 +23,7 @@ export function EventCard({ event }: { event: NetroEvent }) {
                     {new Date(event.startTime).toLocaleDateString('de-DE')} - {event.location}
                 </Text>
                 {/* Requirement: "Mehr Details anzeigen" interaction */}
-                <Text style={styles.moreDetails}>Mehr Details anzeigen ›</Text>
+                <Text style={styles.moreDetails}>Show more details ›</Text>
             </View>
         </TouchableOpacity>
     );
