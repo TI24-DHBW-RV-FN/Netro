@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { useRouter } from 'expo-router'; // Necessary for navigation
+import { useRouter } from 'expo-router'; 
 import { NetroEvent } from '../../../types/event';
 
 export function EventCard({ event }: { event: NetroEvent }) {
