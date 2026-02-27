@@ -10,7 +10,7 @@ export default function TabLayout() {
             tabBarActiveTintColor: '#8A2BE2',
             tabBarInactiveTintColor: '#E2CAF8',
         }}>
-            {/* Requirement: Reiter (Kalender) in der Navbar */}
+            {/* Requirement: Tab (Calendar) in the Navbar */}
             <Tabs.Screen
                 name="Calendar"
                 options={{
