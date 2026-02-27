@@ -1,17 +1,17 @@
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
 import { authStyles } from "./styles";
-import { router } from "expo-router";
-import { useLogin } from "../../features/auth/login";
+import {router} from "expo-router"; // import the styles
+import { useLogin } from "../../features/auth/login"; // import your hook
+
 
 export default function LoginScreen() {
-    // Keep the hook for state management of the UI inputs
-    const { email, setEmail, password, setPassword, error } = useLogin();
+    const { email, setEmail, password, setPassword, error, login } = useLogin();
 
-    // English comment according to Guideline 4
-    // Bypass authentication for UI development purposes
-    const handleBypassLogin = () => {
-        // Navigate directly to the landing page
-        router.replace("/(tabs)/home");
+    const handleLogin = async () => {
+        const success = await login();
+        if (success) {
+            // no navigation needed!
+        }
     };
 
     return (
@@ -23,7 +23,6 @@ export default function LoginScreen() {
             <Text style={authStyles.title}>Login</Text>
             <Text style={authStyles.subtitle}>Welcome back!</Text>
 
-            {/* Error display still functional for UI testing */}
             {error && <Text style={{ color: "red", marginBottom: 10 }}>{error}</Text>}
 
             <TextInput
@@ -45,9 +44,8 @@ export default function LoginScreen() {
                 onChangeText={setPassword}
             />
 
-            {/* Updated button to use the bypass function */}
-            <TouchableOpacity style={authStyles.button} onPress={handleBypassLogin}>
-                <Text style={authStyles.buttonText}>Log In (Bypass)</Text>
+            <TouchableOpacity style={authStyles.button} onPress={handleLogin}>
+                <Text style={authStyles.buttonText}>Log In</Text>
             </TouchableOpacity>
         </View>
     );

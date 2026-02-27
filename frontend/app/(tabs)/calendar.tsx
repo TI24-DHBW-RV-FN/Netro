@@ -22,7 +22,7 @@ const myEvents: NetroEvent[] = [
 ];
 
 export default function CalendarPage() {
-    // DoD: "eigene events nach datum angezeigt werden"
+    // DoD: "own events shown after date"
     const sortedEvents = useMemo(() => {
         return [...myEvents].sort((a, b) =>
             new Date(a.startTime).getTime() - new Date(b.startTime).getTime()
@@ -32,7 +32,7 @@ export default function CalendarPage() {
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.headerTitle}>Mein Kalender</Text>
+                <Text style={styles.headerTitle}>My Calendar</Text>
             </View>
             <ScrollView contentContainerStyle={styles.listContainer}>
                 {sortedEvents.map(event => (

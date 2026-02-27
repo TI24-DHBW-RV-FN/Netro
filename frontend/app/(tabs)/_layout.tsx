@@ -1,5 +1,6 @@
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'react-native';
 
 export default function TabLayout() {
     return (
@@ -11,9 +12,9 @@ export default function TabLayout() {
         }}>
             {/* Requirement: Reiter (Kalender) in der Navbar */}
             <Tabs.Screen
-                name="kalender"
+                name="Calendar"
                 options={{
-                    title: 'Kalender',
+                    title: 'Calendar',
                     tabBarIcon: ({ color }) => <Ionicons name="calendar" size={28} color={color} />,
                 }}
             />
@@ -24,6 +25,24 @@ export default function TabLayout() {
                     tabBarIcon: ({ color }) => <Ionicons name="person" size={28} color={color} />,
                 }}
             />
+
+            <Tabs.Screen
+                name="home"
+                options={{
+                    title: 'Home',
+                    tabBarIcon: ({ color, size }) => (
+                        <Image
+                            source={require('../../assets/netro-icon.png')}
+                            style={{
+                                width: size,
+                                height: size,
+                                tintColor: color
+                            }}
+                        />
+                    ),
+                }}
+            />
+
         </Tabs>
     );
 }
