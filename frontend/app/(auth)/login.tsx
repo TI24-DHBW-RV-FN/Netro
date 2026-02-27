@@ -1,4 +1,3 @@
-import React from 'react'; // Added to resolve potential UMD global issues
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
 import { authStyles } from "./styles";
 import { router } from "expo-router";
