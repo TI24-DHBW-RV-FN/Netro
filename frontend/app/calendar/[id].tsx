@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { NetroEvent } from '../../types/event';
@@ -7,28 +7,30 @@ export default function EventDetailScreen() {
     const { id } = useLocalSearchParams();
     const [event, setEvent] = useState<NetroEvent | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+
+    // Mock ID for Development
     const currentUserId = 1;
 
     useEffect(() => {
-        // DoD Requirement: Navigation triggers "loadEventData"
+        // Requirement: Navigation triggers "loadEventData"
         const loadEventData = async () => {
             try {
                 setIsLoading(true);
-                console.log(`Triggering ladeEventDaten for ID: ${id}`);
+                console.log(`Triggering loadEventData(POST for eventId: ${id})`);
 
                 setTimeout(() => {
                     const mockFetchedEvent: NetroEvent = {
                         id: Number(id),
-                        title: "Basketball match",
-                        description: "Full detailed description only for owners.",
-                        startTime: "2026-03-15T18:00:00Z",
-                        location: "Central Park",
-                        seriesEvent: false,
-                        frequency: null,
-                        createdByUserId: 1, // Change this to 2 to test the owner protection
-                        categories: ["Sports"],
-                        createdAt: "2024-02-13T10:30:00.000Z",
-                        updatedAt: "2024-02-13T10:30:00.000Z"
+                        title: "Basketball Game", // Aligned with API example
+                        description: "Friendly basketball match at the park", // Aligned with API example
+                        startTime: "2026-03-15T18:00:00.000Z", // ISO 8601 format
+                        location: "Central Park", //
+                        seriesEvent: true, // Example from new spec
+                        frequency: "weekly", // Must be string or null
+                        createdAt: "2024-02-13T10:30:00.000Z", //
+                        updatedAt: "2024-02-13T10:30:00.000Z", //
+                        createdByUserId: 1, //
+                        categories: ["basketball", "gaming"] // Array of strings
                     };
                     setEvent(mockFetchedEvent);
                     setIsLoading(false);
@@ -44,7 +46,7 @@ export default function EventDetailScreen() {
 
     if (isLoading) return <ActivityIndicator style={styles.container} color="#8A2BE2" />;
 
-    // DoD Requirement: Listing only for Card-Owner
+    //Detail view only for Card-Owner
     if (event && event.createdByUserId !== currentUserId) {
         return (
             <View style={styles.container}>
@@ -64,7 +66,12 @@ export default function EventDetailScreen() {
             <View style={styles.detailsBox}>
                 <Text style={styles.description}>{event?.description}</Text>
                 <Text style={styles.meta}>Location: {event?.location}</Text>
+                {/* Formatting Date */}
                 <Text style={styles.meta}>Start: {new Date(event?.startTime || "").toLocaleString()}</Text>
+                {/* Showing frequency if it's a series event */}
+                {event?.seriesEvent && (
+                    <Text style={styles.meta}>Frequency: {event.frequency}</Text>
+                )}
             </View>
         </View>
     );

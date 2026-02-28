@@ -8,17 +8,18 @@ import { NetroEvent } from '../../types/event';
 const myEvents: NetroEvent[] = [
     {
         id: 1,
-        title: "Basketball match",
-        description: "Your match",
-        startTime: "2026-03-20T18:00:00Z",
-        location: "City Court",
-        seriesEvent: false,
-        frequency: null,
-        createdByUserId: 1, // Let's assume this is your ID
-        categories: ["Sports"],
-        createdAt: "2024-02-13T10:30:00.000Z",
-        updatedAt: "2024-02-13T10:30:00.000Z"
-    }
+        title: "Basketball Game",
+        description: "Friendly basketball match at the park",
+        startTime: "2026-03-15T18:00:00.000Z", //
+        location: "Central Park",
+        seriesEvent: true, //
+        frequency: "weekly", //
+        createdAt: "2024-02-13T10:30:00.000Z", //
+        updatedAt: "2024-02-13T10:30:00.000Z", //
+        createdByUserId: 1,
+        categories: ["basketball", "gaming"], //
+        imageUrl: "https://via.placeholder.com/150"
+    },
 ];
 
 export default function CalendarPage() {
