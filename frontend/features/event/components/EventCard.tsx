@@ -7,7 +7,7 @@ export function EventCard({ event }: { event: NetroEvent }) {
 
     // Requirement: Navigation triggers "ladeEventDaten"
     const handlePress = () => {
-        router.push(`/kalender/${event.id}`);
+        router.push(`/calendar/${event.id}`);
     };
 
     return (
