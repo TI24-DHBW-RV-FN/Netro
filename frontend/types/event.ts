@@ -4,11 +4,11 @@ export interface NetroEvent {
     description: string;
     startTime: string;
     location: string;
-    imageUrl?: string;
     seriesEvent: boolean;
     frequency: string | null;
-    createdByUserId: number;
-    categories: string[];
     createdAt: string;
     updatedAt: string;
+    createdByUserId: number;
+    categories: string[];
+    imageUrl?: string;
 }
