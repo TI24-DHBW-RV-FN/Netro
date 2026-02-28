@@ -602,6 +602,60 @@ describe("Event Routes", () => {
         });
     });
 
+    describe("DELETE /event/delete", () => {
+        const token = generateToken(1);
+
+        it("should successfully delete an event owned by the user", async () => {
+            mockClient.query
+                .mockResolvedValueOnce({ rows: [{ id: 1, created_by_user_id: 1 }] } as any) // Event check
+                .mockResolvedValueOnce({ rows: [] } as any) // BEGIN
+                .mockResolvedValueOnce({ rows: [] } as any) // DELETE event
+                .mockResolvedValueOnce({ rows: [] } as any); // COMMIT
+
+            const response = await request(app).delete("/event/delete").set("Authorization", `Bearer ${token}`).send({ eventId: 1 });
+
+            expect(response.status).toBe(200);
+            expect(response.body.success).toBe(true);
+            expect(response.body.message).toBe("Event deleted successfully");
+            expect(mockClient.release).toHaveBeenCalled();
+        });
+
+        it("should return 400 if eventId is missing", async () => {
+            const response = await request(app).delete("/event/delete").set("Authorization", `Bearer ${token}`).send({});
+
+            expect(response.status).toBe(400);
+            expect(response.body.errors).toContain("Event ID is required");
+        });
+
+        it("should return 404 if event not found", async () => {
+            mockClient.query.mockResolvedValueOnce({ rows: [] } as any);
+
+            const response = await request(app).delete("/event/delete").set("Authorization", `Bearer ${token}`).send({ eventId: 999 });
+
+            expect(response.status).toBe(404);
+            expect(response.body.message).toBe(ErrorMessages.EVENT_NOT_FOUND);
+        });
+
+        it("should return 403 if user does not own the event", async () => {
+            mockClient.query.mockResolvedValueOnce({ rows: [{ id: 1, created_by_user_id: 99 }] } as any);
+
+            const response = await request(app).delete("/event/delete").set("Authorization", `Bearer ${token}`).send({ eventId: 1 });
+
+            expect(response.status).toBe(403);
+            expect(response.body.message).toBe(ErrorMessages.NO_PERMISSION_DELETE_EVENT);
+        });
+
+        it("should return 500 on database error and rollback", async () => {
+            mockClient.query.mockRejectedValueOnce(new Error("Database error"));
+
+            const response = await request(app).delete("/event/delete").set("Authorization", `Bearer ${token}`).send({ eventId: 1 });
+
+            expect(response.status).toBe(500);
+            expect(response.body.message).toBe(ErrorMessages.EVENT_DELETE_FAILED);
+            expect(mockClient.release).toHaveBeenCalled();
+        });
+    });
+
     describe("POST /event/info", () => {
         const token = generateToken(1);
 

@@ -1101,6 +1101,90 @@ paths:
                 success: false
                 message: Failed to retrieve event
 
+  /event/delete:
+    delete:
+      tags:
+        - Events
+      summary: Delete an event
+      description: Delete an existing event. Only the creator of the event can delete it. Authentication is required.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - eventId
+              properties:
+                eventId:
+                  type: integer
+                  description: ID of the event to delete
+                  example: 1
+      responses:
+        '200':
+          description: Event deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+              example:
+                success: true
+                message: Event deleted successfully
+        '400':
+          description: Event ID is missing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+              example:
+                success: false
+                message: Validation failed
+                errors: ["Event ID is required"]
+        '401':
+          description: Unauthorized - missing token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: Access token is required
+        '403':
+          description: Forbidden - invalid token or insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                invalidToken:
+                  value:
+                    success: false
+                    message: Invalid or expired token
+                noPermission:
+                  value:
+                    success: false
+                    message: You do not have permission to delete this event
+        '404':
+          description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: Event not found
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                success: false
+                message: Failed to delete event
+
 components:
   securitySchemes:
     bearerAuth:
