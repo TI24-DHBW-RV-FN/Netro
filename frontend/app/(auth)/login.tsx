@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, TextInput } from "react-native";
+import { View, Text, TouchableOpacity, TextInput} from "react-native";
 import { authStyles } from "./styles";
 import {router} from "expo-router"; // import the styles
 import { useLogin } from "../../features/auth/login"; // import your hook
