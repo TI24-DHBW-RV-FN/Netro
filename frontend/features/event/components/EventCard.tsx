@@ -5,7 +5,7 @@ import { NetroEvent } from '../../../types/event';
 export function EventCard({ event }: { event: NetroEvent }) {
     const router = useRouter();
 
-    // Requirement: Navigation triggers "ladeEventDaten"
+    // Requirement: Navigation triggers "loadEventData"
     const handlePress = () => {
         router.push(`/calendar/${event.id}`);
     };
