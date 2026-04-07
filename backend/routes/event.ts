@@ -254,6 +254,51 @@ router.put("/edit", authenticateToken, async (req: Request, res: Response) => {
     }
 });
 
+router.get("/list", authenticateToken, async (req: Request, res: Response) => {
+    try {
+        const userId = (req as any).user.userId;
+
+        const eventsResult = await pool.query(
+            `SELECT e.id, e.title, e.description, e.start_time, e.location, e.series_event, e.frequency, e.created_at, e.updated_at, e.created_by_user_id,
+                    COALESCE(
+                        (SELECT array_agg(c.name ORDER BY c.name)
+                         FROM events_categories ec2
+                         JOIN category c ON ec2.category_id = c.id
+                         WHERE ec2.events_id = e.id),
+                        ARRAY[]::text[]
+                    ) AS categories
+             FROM events e
+             WHERE e.id IN (
+                 SELECT DISTINCT ec.events_id
+                 FROM events_categories ec
+                 JOIN users_categories uc ON ec.category_id = uc.category_id
+                 WHERE uc.users_id = $1
+             )
+             ORDER BY e.start_time ASC`,
+            [userId],
+        );
+
+        const events = eventsResult.rows.map((event: any) => ({
+            id: event.id,
+            title: event.title,
+            description: event.description,
+            startTime: event.start_time,
+            location: event.location,
+            seriesEvent: event.series_event,
+            frequency: event.frequency,
+            createdAt: event.created_at,
+            updatedAt: event.updated_at,
+            createdByUserId: event.created_by_user_id,
+            categories: event.categories,
+        }));
+
+        return sendSuccess(res, 200, "Events retrieved successfully", { events });
+    } catch (error) {
+        console.error("Event list error:", error);
+        return sendError(res, 500, ErrorMessages.EVENT_LIST_FAILED);
+    }
+});
+
 router.post("/info", authenticateToken, async (req: Request, res: Response) => {
     try {
         const { eventId } = req.body;

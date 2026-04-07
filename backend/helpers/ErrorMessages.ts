@@ -46,6 +46,7 @@ export const ErrorMessages = {
     EVENT_CREATE_FAILED: "Failed to create event",
     EVENT_UPDATE_FAILED: "Failed to update event",
     EVENT_FETCH_FAILED: "Failed to retrieve event",
+    EVENT_LIST_FAILED: "Failed to retrieve events",
     NO_PERMISSION_EDIT_EVENT: "You do not have permission to edit this event",
 
     // Generic
