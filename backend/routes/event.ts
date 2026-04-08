@@ -349,4 +349,42 @@ router.post("/info", authenticateToken, async (req: Request, res: Response) => {
     }
 });
 
+router.delete("/delete", authenticateToken, async (req: Request, res: Response) => {
+    const client = await pool.connect();
+    try {
+        const userId = (req as any).user.userId;
+        const { eventId } = req.body;
+
+        if (!eventId) {
+            return sendError(res, 400, ErrorMessages.VALIDATION_FAILED, ["Event ID is required"]);
+        }
+
+        const eventCheckResult = await client.query(`SELECT id, created_by_user_id FROM events WHERE id = $1`, [eventId]);
+
+        if (eventCheckResult.rows.length === 0) {
+            return sendError(res, 404, ErrorMessages.EVENT_NOT_FOUND);
+        }
+
+        if (eventCheckResult.rows[0].created_by_user_id !== userId) {
+            return sendError(res, 403, ErrorMessages.NO_PERMISSION_DELETE_EVENT);
+        }
+
+        await client.query("BEGIN");
+
+        await client.query(`DELETE FROM events WHERE id = $1`, [eventId]);
+
+        await client.query("COMMIT");
+
+        console.log("✅ Event deleted successfully:", { eventId, deletedBy: userId });
+
+        return sendSuccess(res, 200, "Event deleted successfully");
+    } catch (error) {
+        await client.query("ROLLBACK");
+        console.error("Event deletion error:", error);
+        return sendError(res, 500, ErrorMessages.EVENT_DELETE_FAILED);
+    } finally {
+        client.release();
+    }
+});
+
 export default router;
