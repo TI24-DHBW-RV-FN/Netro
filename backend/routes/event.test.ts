@@ -656,6 +656,105 @@ describe("Event Routes", () => {
         });
     });
 
+    describe("GET /event/list", () => {
+        const token = generateToken(1);
+
+        it("should return events matching user categories", async () => {
+            const mockEvents = [
+                {
+                    id: 1,
+                    title: "Basketball Game",
+                    description: "Weekly basketball",
+                    start_time: new Date("2026-03-01T18:00:00Z"),
+                    location: "Sports Center",
+                    series_event: false,
+                    frequency: null,
+                    created_at: new Date(),
+                    updated_at: new Date(),
+                    created_by_user_id: 2,
+                    categories: ["basketball", "sports"],
+                },
+                {
+                    id: 2,
+                    title: "Soccer Match",
+                    description: "Weekend soccer",
+                    start_time: new Date("2026-03-08T14:00:00Z"),
+                    location: "City Park",
+                    series_event: true,
+                    frequency: "weekly",
+                    created_at: new Date(),
+                    updated_at: new Date(),
+                    created_by_user_id: 3,
+                    categories: ["soccer"],
+                },
+            ];
+
+            vi.mocked(pool.query).mockResolvedValueOnce({ rows: mockEvents } as any);
+
+            const response = await request(app).get("/event/list").set("Authorization", `Bearer ${token}`);
+
+            expect(response.status).toBe(200);
+            expect(response.body.success).toBe(true);
+            expect(response.body.message).toBe("Events retrieved successfully");
+            expect(response.body.events).toHaveLength(2);
+            expect(response.body.events[0]).toHaveProperty("id", 1);
+            expect(response.body.events[0]).toHaveProperty("title", "Basketball Game");
+            expect(response.body.events[0].categories).toEqual(["basketball", "sports"]);
+            expect(response.body.events[1]).toHaveProperty("seriesEvent", true);
+            expect(response.body.events[1]).toHaveProperty("frequency", "weekly");
+            expect(pool.query).toHaveBeenCalledTimes(1);
+        });
+
+        it("should return empty array when no events match user categories", async () => {
+            vi.mocked(pool.query).mockResolvedValueOnce({ rows: [] } as any);
+
+            const response = await request(app).get("/event/list").set("Authorization", `Bearer ${token}`);
+
+            expect(response.status).toBe(200);
+            expect(response.body.success).toBe(true);
+            expect(response.body.events).toEqual([]);
+        });
+
+        it("should return events with camelCase field names", async () => {
+            const mockEvent = {
+                id: 1,
+                title: "Test Event",
+                description: "Test description",
+                start_time: new Date("2026-03-01T10:00:00Z"),
+                location: "Test Location",
+                series_event: false,
+                frequency: null,
+                created_at: new Date("2026-01-01T00:00:00Z"),
+                updated_at: new Date("2026-01-02T00:00:00Z"),
+                created_by_user_id: 5,
+                categories: ["running"],
+            };
+
+            vi.mocked(pool.query).mockResolvedValueOnce({ rows: [mockEvent] } as any);
+
+            const response = await request(app).get("/event/list").set("Authorization", `Bearer ${token}`);
+
+            expect(response.status).toBe(200);
+            expect(response.body.events[0]).toHaveProperty("startTime");
+            expect(response.body.events[0]).toHaveProperty("seriesEvent", false);
+            expect(response.body.events[0]).toHaveProperty("createdAt");
+            expect(response.body.events[0]).toHaveProperty("updatedAt");
+            expect(response.body.events[0]).toHaveProperty("createdByUserId", 5);
+            expect(response.body.events[0]).not.toHaveProperty("start_time");
+            expect(response.body.events[0]).not.toHaveProperty("series_event");
+        });
+
+        it("should return 500 on database error", async () => {
+            vi.mocked(pool.query).mockRejectedValueOnce(new Error("Database error"));
+
+            const response = await request(app).get("/event/list").set("Authorization", `Bearer ${token}`);
+
+            expect(response.status).toBe(500);
+            expect(response.body.success).toBe(false);
+            expect(response.body.message).toBe(ErrorMessages.EVENT_LIST_FAILED);
+        });
+    });
+
     describe("POST /event/info", () => {
         const token = generateToken(1);
 
