@@ -45,8 +45,10 @@ export const ErrorMessages = {
     EVENT_NOT_FOUND: "Event not found",
     EVENT_CREATE_FAILED: "Failed to create event",
     EVENT_UPDATE_FAILED: "Failed to update event",
+    EVENT_DELETE_FAILED: "Failed to delete event",
     EVENT_FETCH_FAILED: "Failed to retrieve event",
     NO_PERMISSION_EDIT_EVENT: "You do not have permission to edit this event",
+    NO_PERMISSION_DELETE_EVENT: "You do not have permission to delete this event",
 
     // Generic
     REGISTRATION_FAILED: "Registration failed",
