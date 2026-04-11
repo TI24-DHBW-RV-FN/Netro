@@ -1,0 +1,318 @@
+*   1ea712f - (3 days ago) Merge pull request #36 from TI24-DHBW-RV-FN/feature/2.2.1-get-event-info - Lucius201 (HEAD -> release/s.2, origin/release/s.2)
+|\  
+| *   ed73823 - (3 days ago) Merge remote-tracking branch 'origin/release/s.2' into feature/2.2.1-get-event-info - LuciusL
+| |\  
+| |/  
+|/|   
+* |   30f37ac - (3 days ago) Merge pull request #37 from TI24-DHBW-RV-FN/feature/2.3.2-edit-delete-event - Lucius201
+|\ \  
+| * | 3e51952 - (6 weeks ago) feat: add delete route - LuciusL
+|/ /  
+| * 42b4ac5 - (4 days ago) docs: add /event/list route the api docs - LuciusL
+| * 7ae436f - (4 days ago) feat: add /list route to list all events for the users categories - LuciusL
+|/  
+*   960f191 - (7 weeks ago) Merge pull request #34 from Wes1101/docs/api-docs - Lucius201
+|\  
+| * d865720 - (7 weeks ago) fix: copilot changes - LuciusL
+| * 5890c05 - (7 weeks ago) docs: add docs for event route - LuciusL
+| *   5bc5109 - (7 weeks ago) Merge branch 'release/s.2' into feature/2.2.1-get-event-info - LuciusL
+| |\  
+| |/  
+|/|   
+* |   897704d - (7 weeks ago) Merge pull request #33 from Wes1101/feature/2.1.2-create-event - Lucius201
+|\ \  
+| * | 0b68252 - (7 weeks ago) fix: make copilot bugfixes - LuciusL
+| * |   be2d0c0 - (7 weeks ago) Merge branch 'release/s.2' into feature/2.1.2-create-event - LuciusL
+| |\ \  
+| * \ \   f71e802 - (8 weeks ago) Merge branch 'release/s.2' into feature/2.1.2-create-event - LuciusL
+| |\ \ \  
+| * | | | 41b6de4 - (8 weeks ago) fix: remove import for unused router - LuciusL
+| * | | | 0b70f7c - (8 weeks ago) refactor: move edit.ts to profile.ts for editing profile - LuciusL
+| * | | | 5908a1d - (8 weeks ago) test: add tests for event - LuciusL
+| * | | | b1c36c2 - (8 weeks ago) feat: add event routes - LuciusL
+| * | | |   d579509 - (8 weeks ago) Merge branch 'release/s.1' into feature/2.1.2-create-event - LuciusL
+| |\ \ \ \  
+| * \ \ \ \   d98bb51 - (8 weeks ago) Merge branch 'release/s.1' into feature/2.1.2-create-event - LuciusL
+| |\ \ \ \ \  
+| * \ \ \ \ \   1306e94 - (8 weeks ago) Merge branch 'release/s.1' into feature/2.1.2-create-event - LuciusL
+| |\ \ \ \ \ \  
+| * | | | | | | 4165d21 - (8 weeks ago) feat: add table events to database and structure for event route - LuciusL
+* | | | | | | |   07faf0f - (7 weeks ago) Merge pull request #32 from Wes1101/feature/1.1.7-email-layout - yanneckk
+|\ \ \ \ \ \ \ \  
+| |_|_|_|_|_|/ /  
+|/| | | | | | |   
+| * | | | | | | ebe74bd - (7 weeks ago) feat(emailSend): layout for verification email - yanneckk
+|/ / / / / / /  
+| | | | | | * 1162923 - (7 weeks ago) feat: get event Info with eventId via POST event/info - LuciusL
+| |_|_|_|_|/  
+|/| | | | |   
+* | | | | |   5e2a9df - (7 weeks ago) Merge pull request #31 from Wes1101/feature/1.1.6-stylesheet - yanneckk
+|\ \ \ \ \ \  
+| |_|_|_|_|/  
+|/| | | | |   
+| * | | | | c0d9fc1 - (8 weeks ago) feat(style):1.1.6 correct index - yanneckk
+| * | | | | 791dcc9 - (8 weeks ago) feat(style):1.1.6 full stylesheet - yanneckk
+| * | | | | b828338 - (8 weeks ago) feat(style):1.1.6 added input fields - yanneckk
+| * | | | | 7301193 - (8 weeks ago) feat(style):1.1.6 added light/darkmode, text design and general styling sizes - yanneckk
+| * | | | | 12c800d - (8 weeks ago) feat(splashscreen): 1.1.6 added a splashscreen - yanneckk
+| | |_|_|/  
+| |/| | |   
+| | | | | * 7bc2ee2 - (6 weeks ago) fix(ui) removed useless komma - Simon (origin/feature/2.2.2-short-card-visualisation-and-calendar)
+| | | | | *   266cbb2 - (6 weeks ago) Merge remote-tracking branch 'origin/feature/2.2.2-short-card-visualisation-and-calendar' into feature/2.2.2-short-card-visualisation-and-calendar - Simon
+| | | | | |\  
+| | | | | | * e0bf8e8 - (6 weeks ago) fix(ui) comment - Simon Liebl
+| | | | | | * c680c02 - (6 weeks ago) Update frontend/app/calendar/[id].tsx - Simon Liebl
+| | | | | * | 13e1375 - (6 weeks ago) fix(ui) removed useless space - Simon
+| | | | | |/  
+| | | | | * ee6ad50 - (6 weeks ago) fix(ui) removed react import - Simon
+| | | | | * c03b9df - (6 weeks ago) fix(ui) removed jsx global - Simon
+| | | | | * f4d0d6b - (6 weeks ago) fix(ui) Update Mock Event - simon
+| | | | | * e841b53 - (6 weeks ago) fix(ui) Update event.ts - simon
+| | | | | * a62bc20 - (6 weeks ago) fix(ui) refactor - Simon Liebl
+| | | | | * 646f6bb - (6 weeks ago) fix(ui) removed linebreak - Simon Liebl
+| | | | | * 2a1aa60 - (6 weeks ago) fix(ui) removed import - Simon Liebl
+| | | | | * 7cf378b - (6 weeks ago) fix(ui) removed import - simon
+| | | | | * 9a73c0e - (6 weeks ago) Update frontend/app/(tabs)/calendar.tsx - Simon Liebl
+| | | | | *   771a0d4 - (6 weeks ago) Merge remote-tracking branch 'origin/feature/2.2.2-short-card-visualisation-and-calendar' into feature/2.2.2-short-card-visualisation-and-calendar - simon
+| | | | | |\  
+| | | | | | * f94cb26 - (6 weeks ago) fix(ui) react import - Simon Liebl
+| | | | | | * 19d0a47 - (6 weeks ago) Update frontend/features/event/components/EventCard.tsx - Simon Liebl
+| | | | | * | a6708c0 - (6 weeks ago) fix(ui): comment - simon
+| | | | | * | 7e03f28 - (6 weeks ago) fix(ui): newline - simon
+| | | | | * | b45fcc8 - (6 weeks ago) fix(ui): comment - simon
+| | | | | |/  
+| | | | | *   2fe8d2d - (6 weeks ago) Merge remote-tracking branch 'origin/feature/2.2.2-short-card-visualisation-and-calendar' into feature/2.2.2-short-card-visualisation-and-calendar - simon
+| | | | | |\  
+| | | | | | * 6fdd12a - (6 weeks ago) fix(ui) added back home tab missing - Simon
+| | | | | | *   c7856b8 - (6 weeks ago) Merge remote-tracking branch 'origin/feature/2.2.2-short-card-visualisation-and-calendar' into feature/2.2.2-short-card-visualisation-and-calendar - Simon
+| | | | | | |\  
+| | | | | | | * 5f2f963 - (6 weeks ago) fix(ui) german to english - Simon Liebl
+| | | | | | * | 8e07c8e - (6 weeks ago) fix(ui) comments - Simon
+| | | | | | |/  
+| | | | | | *   f5102ec - (6 weeks ago) Merge remote-tracking branch 'origin/feature/2.2.2-short-card-visualisation-and-calendar' into feature/2.2.2-short-card-visualisation-and-calendar - Simon
+| | | | | | |\  
+| | | | | | | * 84b57ed - (6 weeks ago) fix(ui) german to english - Simon Liebl
+| | | | | | * | 4b92047 - (6 weeks ago) fix(ui) comments - Simon
+| | | | | | |/  
+| | | | | | * 69e75cd - (6 weeks ago) fix(ui) german comment - Simon
+| | | | | | *   30f40c8 - (6 weeks ago) Merge remote-tracking branch 'origin/feature/2.2.2-short-card-visualisation-and-calendar' into feature/2.2.2-short-card-visualisation-and-calendar - Simon
+| | | | | | |\  
+| | | | | | | * d46a210 - (6 weeks ago) fix(ui) Kalender to Calendar - Simon Liebl
+| | | | | | | * 6fc4f6d - (6 weeks ago) fix(ui) kalender  to Calendar - Simon Liebl
+| | | | | | * | ce047c3 - (6 weeks ago) fix(ui) Kalender to Calendar - Simon Liebl
+| | | | | | * | 08f58d9 - (6 weeks ago) fix(ui) kalender  to Calendar - Simon Liebl
+| | | | | | * | fa010b3 - (6 weeks ago) fix(ui) reverted accidental commit of bypass for login.tsx - Simon
+| | | | | | * | c1c53b7 - (7 weeks ago) fix(ui): removed backend/types/event.ts - simon
+| | | | | | * | 79ee98f - (7 weeks ago) feat(ui): enforce owner logic and backend data fetch in event details - simon
+| | | | | | * | 9e624d1 - (7 weeks ago) refactor(ui): focus on calendar requirements and remove landing page placeholder - simon
+| | | | | | * | 27a0188 - (7 weeks ago) feat(ui): add dynamic image support to EventCard - simon
+| | | | | | * | fd88a94 - (7 weeks ago) feat(ui): implement sorted calendar view for user events - simon
+| | | | | | * | 3615651 - (7 weeks ago) feat(nav): add calendar tab to bottom navbar - simon
+| | | | | | * | 08c5ee4 - (7 weeks ago) fix(ui) fixed stylesheet references - simon
+| | | | | * | | e74f152 - (6 weeks ago) fix(ui): removed jsx:react and unnecesary react imports - simon
+| | | | | | |/  
+| | | | | |/|   
+| | | | | * | 3a4ec50 - (7 weeks ago) fix(ui): removed backend/types/event.ts - simon
+| | | | | * | fac46db - (7 weeks ago) feat(ui): enforce owner logic and backend data fetch in event details - simon
+| | | | | * | 76f8b7f - (7 weeks ago) refactor(ui): focus on calendar requirements and remove landing page placeholder - simon
+| | | | | * | 2754e64 - (7 weeks ago) feat(ui): add dynamic image support to EventCard - simon
+| | | | | * | 5f08fdd - (7 weeks ago) feat(ui): implement sorted calendar view for user events - simon
+| | | | | * | 619c881 - (7 weeks ago) feat(nav): add calendar tab to bottom navbar - simon
+| | | | | * | 8a52507 - (7 weeks ago) fix(ui) fixed stylesheet references - simon
+| | | | | |/  
+| | | | | * 34243d4 - (7 weeks ago) fix(ui) add missing import React - simon
+| | | | | * 485b4e8 - (7 weeks ago) docs(ui): removal of useless comment - simon
+| | | | | * f319e93 - (7 weeks ago) fix(ui): align mock data with NetroEvent interface - simon
+| | | | | * 230a075 - (7 weeks ago) feat(ui): fix of import - simon
+| | | | | * e86bf2b - (7 weeks ago) feat(ui): integrate event card into home landing page - simon
+| | | | | * 6ff0896 - (7 weeks ago) feat(ui): implement event card component and home integration - simon
+| | | | | * 1ac6154 - (7 weeks ago) feat(ui):add EventCard.tsx - simon
+| | | | | * a0de7b2 - (7 weeks ago) feat(ui):add event type definition - simon
+| |_|_|_|/  
+|/| | | |   
+* | | | |   9c9f656 - (8 weeks ago) Merge pull request #26 from Wes1101/release/s.1 - Lucius201 (origin/main, origin/HEAD, main)
+|\ \ \ \ \  
+| * \ \ \ \   0c8a2cf - (8 weeks ago) Merge pull request #30 from Wes1101/bugfix/release/s.1 - Fabian (origin/release/s.1)
+| |\ \ \ \ \  
+| | |/ / / /  
+| |/| | | |   
+| | * | | | d77e1a3 - (8 weeks ago) bugfix(ui): prevent potential syntax problems - f-wllr
+| |/ / / /  
+| * | | |   5faf895 - (8 weeks ago) Merge pull request #29 from Wes1101/bugfix/release/s.1 - Fabian
+| |\ \ \ \  
+| | |_|_|/  
+| |/| | |   
+| | * | | b1c7560 - (8 weeks ago) bugfix(ui): when pressing logout redirect to landing page instead of login page - f-wllr
+| | * | | e8a78b6 - (8 weeks ago) bugfix(ui): add default exports to styles - f-wllr
+| | * | | ba95378 - (8 weeks ago) feat(ui): safeguard missing env - f-wllr
+| * | | | f928af3 - (8 weeks ago) Merge pull request #28 from Wes1101/bugfix/release/s.1 - Fabian
+| |\| | | 
+| | |_|/  
+| |/| |   
+| | * | 90852ac - (8 weeks ago) bugfix(ui): fix env problem - f-wllr
+| | * | 5a4144d - (8 weeks ago) refactor: add "dotenv" dependency - LuciusL
+| | * | b2e659c - (8 weeks ago) bugfix(ui): remove unused imports/variables, change comments to English - f-wllr
+| | * | 0a84924 - (8 weeks ago) bugfix(ui): implement correct .env handling - f-wllr
+| | * | 33ca6c1 - (8 weeks ago) bugfix(ui): add correct api calls to email verification logic, rename email verification functions to camelCase - f-wllr
+| | * | 1e0c9a3 - (8 weeks ago) bugfix(ui): remove unused file frontend/app/profile/_layout.tsx - f-wllr
+| * | |   ff3beb6 - (8 weeks ago) Merge pull request #27 from Wes1101/bugfix/release/s.1-backend - Lucius201
+| |\ \ \  
+| | * | | c394efb - (8 weeks ago) refactor: remove unused imports - LuciusL
+| | * | | b16aa43 - (8 weeks ago) fix: typo - LuciusL
+| | * | | fcc322f - (8 weeks ago) refactor: add generalized error handling and update openapi doc - LuciusL
+| | * | | 84a5f2e - (8 weeks ago) test: add test for verify.ts - LuciusL
+| | * | | d47a968 - (8 weeks ago) refactor: remove unused mock - LuciusL
+| | * | | 072d7bf - (8 weeks ago) fix: remove sql injection vulnerability - LuciusL
+| | * | | 93fd57c - (8 weeks ago) refactor: remove old comments from register.ts - LuciusL
+| | * | | a83cb38 - (8 weeks ago) fix: remove sql injection vulnerability - LuciusL
+| | * | | 2459821 - (8 weeks ago) refactor: remove emailTypes.ts and update tests - LuciusL
+| | * | | d42aa1c - (8 weeks ago) fix: add server.ts as entry point instead of app.ts to prevent side effects - LuciusL
+| | |/ /  
+| | * / af93ea4 - (8 weeks ago) fix(backend): add TLS for SMTP in production - LuciusL
+| |/ /  
+| * |   2f2b5ba - (8 weeks ago) Merge pull request #25 from Wes1101/bugfix/login-test-file - Lucius201
+| |\ \  
+| | |/  
+| |/|   
+| | * 8de9aa5 - (8 weeks ago) fix: fix login.test.ts types to be able to be built by "npm run build" and add swagger-ui-express and yamljs as devdependecies - LuciusL
+| |/  
+| *   aaedf06 - (8 weeks ago) Merge pull request #24 from Wes1101/chore/api-documentation - Lucius201
+| |\  
+| | * b8c4bca - (8 weeks ago) chore: add api documentation - LuciusL
+| |/  
+| *   90d40c3 - (8 weeks ago) Merge pull request #23 from Wes1101/feature/1.3.4-Signout-on-profil-page - Simon Liebl
+| |\  
+| | * 094d6e2 - (8 weeks ago) feat(ui): Add Feature Login Button to Profile Tab - Simon
+| | * 438204f - (8 weeks ago) feat(ui): Add Feature Login Button to Profile Tab - Simon
+| |/  
+| *   8a13d28 - (8 weeks ago) Merge pull request #22 from Wes1101/bugfix/fix-auth - Fabian
+| |\  
+| | * e5440c3 - (8 weeks ago) fix(ui): add safeguard around signout - Fabian
+| | * c636c75 - (8 weeks ago) feat(ui): add logout button on profile page - f-wllr
+| | * 1b0c3c3 - (8 weeks ago) bugfix(ui): fully integrate persistent login - f-wllr
+| |/  
+| *   1096264 - (9 weeks ago) Merge pull request #21 from Wes1101/feature/1.3.3-empty-landing-page-with-navbar - Simon Liebl
+| |\  
+| | *   ed04e6f - (9 weeks ago) Merge remote-tracking branch 'origin/release/s.1' into feature/1.3.3-empty-landing-page-with-navbar - simon
+| | |\  
+| | |/  
+| |/|   
+| * |   61ecbbd - (9 weeks ago) Merge pull request #20 from Wes1101/feature/1.1.1-ui-create-registration - Fabian
+| |\ \  
+| | * | e43ba8e - (9 weeks ago) bugfix(ui): fix flow of registration - f-wllr
+| | * | 70009db - (9 weeks ago) Revert "bugfix(ui): after successful creation of account redirect to index" - f-wllr
+| | * | 9428ad7 - (9 weeks ago) bugfix(ui): add clarification why authenticaed flow is commented out - f-wllr
+| | * | 1559f7b - (9 weeks ago) bugfix(ui): fix spelling mistake - f-wllr
+| | * | 331f064 - (9 weeks ago) bugfix(ui): update button text color to be more readable - f-wllr
+| | * | ed53e41 - (9 weeks ago) bugfix(ui): clarify failiure message - f-wllr
+| | * | e4345cb - (9 weeks ago) bugfix(ui): handle response from signup backend call - f-wllr
+| | * | 2988b35 - (9 weeks ago) bugfix(ui): after successful creation of account redirect to index - f-wllr
+| | * | 50f013d - (9 weeks ago) bugfix(ui): refactor screen names to be more descriptive - f-wllr
+| | * | f34543e - (9 weeks ago) bugfix(ui): refactor Categories to be of type string[] - f-wllr
+| | * | a55b3a0 - (9 weeks ago) feat(ui): add registration process - f-wllr
+| | | * 30e99d8 - (9 weeks ago) Styling: with color palette stylesheet: styles.ts Icon Styling Home = Netro Logo - Simon
+| | | *   cdd7ab6 - (9 weeks ago) Merge pull request #12 from Wes1101/release/s.1 - Fabian
+| | | |\  
+| | | * | db47a40 - (9 weeks ago) Landing page, Navbar mit Home und Profile - Simon
+| | | | | * 1f6fb89 - (8 weeks ago) feat(profile_page):1.3.1-profile-page - yanneckk (origin/feature/1.3.1-load-profile-data-and-input-form)
+| | |_|_|/  
+| |/| | |   
+| * | | |   48b3925 - (9 weeks ago) Merge pull request #19 from Wes1101/feature/1.3.1-load-profile-data-and-input-form - yanneckk
+| |\ \ \ \  
+| | * | | | ab4d4d2 - (9 weeks ago) feat(profile): first layout - yanneckk
+| * | | | |   75644de - (9 weeks ago) Merge pull request #18 from Wes1101/test/profile-route-test - Lucius201
+| |\ \ \ \ \  
+| | * | | | | da56e72 - (9 weeks ago) test(routes): add test cases to profile route - LuciusL
+| |/ / / / /  
+| * | | | |   6402de8 - (9 weeks ago) Merge pull request #17 from Wes1101/bugfix/profile-and-category-route - Lucius201
+| |\ \ \ \ \  
+| | |_|/ / /  
+| |/| | | |   
+| | * | | | aad4194 - (9 weeks ago) fix(routes): change profile route accordingly to user table and change category output - LuciusL
+| |/ / / /  
+| * | | |   219bc61 - (9 weeks ago) Merge pull request #16 from Wes1101/chore/npm-test-script - Lucius201
+| |\ \ \ \  
+| | * | | | f863735 - (9 weeks ago) chore: add script in package.json for testing in backend - LuciusL
+| |/ / / /  
+| * | | |   80cdee2 - (9 weeks ago) Merge pull request #15 from Wes1101/feature/1.1.4-email-verification - Lucius201
+| |\ \ \ \  
+| | |/ / /  
+| |/| | |   
+| | * | | 13c1e16 - (9 weeks ago) feat(email): implement the email function to the register route and the create /verify/code GET to get a new code - LuciusL
+| * | | | 7c47733 - (9 weeks ago) Merge pull request #14 from Wes1101/feature/1.1.5-directory-struc - yanneckk
+| |\| | | 
+| | * | |   5cd40d0 - (9 weeks ago) Merge branch 'release/s.1' into feature/1.1.5-directory-struc - yanneckk
+| | |\ \ \  
+| | |/ / /  
+| |/| | |   
+| * | | |   da2dc35 - (9 weeks ago) Merge pull request #13 from Wes1101/feature/1.3.2-edit-profile - Lucius201
+| |\ \ \ \  
+| | |_|_|/  
+| |/| | |   
+| | * | | 6b50f70 - (9 weeks ago) fix: fix dependencies - LuciusL
+| | * | |   3bf6a2a - (9 weeks ago) Merge branch 'release/s.1' into feature/1.3.2-edit-profile - LuciusL
+| | |\ \ \  
+| | |/ / /  
+| |/| | |   
+| * | | |   68e31f9 - (9 weeks ago) Merge pull request #11 from Wes1101/bugfix/ui-login-store-authContext - Fabian
+| |\ \ \ \  
+| | |_|_|/  
+| |/| | |   
+| | * | | e63e69e - (9 weeks ago) bugfix(ui): add authContext to save login information - f-wllr
+| | | * | d84ca8a - (9 weeks ago) feat(profile): add email change route and fixed bugs - LuciusL
+| | | * | dfa1e40 - (9 weeks ago) feat: add edit profile and password logic - LuciusL
+| | |/ /  
+| | | * f528918 - (9 weeks ago) feat(email): modularize code and add unit tests - yanneckk
+| | |/  
+| |/|   
+| * |   537f3a3 - (9 weeks ago) Merge pull request #10 from Wes1101/feature/1.1.5-email-validation-mail - yanneckk
+| |\ \  
+| | |/  
+| |/|   
+| | *   503f71e - (9 weeks ago) Merge branch 'release/s.1' into feature/1.1.5-email-validation-mail - yanneckk
+| | |\  
+| | |/  
+| |/|   
+| * |   9299dd4 - (9 weeks ago) Merge pull request #8 from Wes1101/feature/1.1.1-ui-login - Fabian
+| |\ \  
+| | * | acfec7e - (9 weeks ago) Apply suggestions from code review - Fabian
+| | * | dfaed88 - (9 weeks ago) feat(ui): add ui for login - f-wllr
+| * | |   45d41b9 - (9 weeks ago) Merge pull request #9 from Wes1101/bugfix/1.backend - Lucius201
+| |\ \ \  
+| | * | | b40a58d - (9 weeks ago) fix: fix databse connections and profile route - LuciusL
+| |/ / /  
+| * | |   3ad249d - (9 weeks ago) Merge pull request #7 from Wes1101/feature/1.1.2-full-register-logic - Lucius201
+| |\ \ \  
+| | * | | 1316007 - (9 weeks ago) feat: add categories to registration logic and small changes to login logic - LuciusL
+| | * | | 3189ec1 - (9 weeks ago) feat: add category table and category route to GET all categories - LuciusL
+| |/ / /  
+| * | |   b0086df - (9 weeks ago) Merge pull request #6 from Wes1101/test/1.1-2-3-backend-tests - Lucius201
+| |\ \ \  
+| | * | | b347111 - (9 weeks ago) test: add tests for the backend logic - LuciusL
+| |/ / /  
+| * | |   9e3ce6d - (9 weeks ago) Merge pull request #5 from Wes1101/feature/1.1.2-register-logic - Lucius201
+| |\ \ \  
+| | * | | b3f332f - (9 weeks ago) feat: add register logic - LuciusL
+| |/ / /  
+| * | |   2086cbe - (9 weeks ago) Merge pull request #4 from Wes1101/feature/1.3.2-login-logic - Lucius201
+| |\ \ \  
+| | * | | a4edf46 - (9 weeks ago) feat: add login logic - LuciusL
+| |/ / /  
+| * | |   d4fd12d - (9 weeks ago) Merge pull request #3 from Wes1101/feature/1.3.2-jwt-token - Lucius201
+| |\ \ \  
+| | * | | fdddd82 - (9 weeks ago) feat: add jwt token functions - LuciusL
+| |/ / /  
+| * | |   bdda516 - (9 weeks ago) Merge pull request #2 from Wes1101/feature/1.1.4-hashing - Lucius201
+| |\ \ \  
+| | |/ /  
+| |/| |   
+| | * | 1b3108c - (9 weeks ago) feat: add hashing functions - LuciusL
+| |/ /  
+| | * 2960083 - (9 weeks ago) feat(email): build first email service - yanneckk
+| |/  
+| * 0d611c9 - (10 weeks ago) feat: create initial project setup - LuciusL
+|/  
+| * 5affeb5 - (5 months ago) ADDITION of LOGIN USE CASE - simon (origin/docs/UseCaseDiagram)
+| * a8ed79c - (6 months ago) Initial Upload UseCaseDiagram.drawio v1.0 - simon
+|/  
+* 6170309 - (6 months ago) Initial commit - David Willig
