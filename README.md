@@ -75,23 +75,44 @@ Prerequisites:
 Use docker-compose to set up the Postgres database:
 
 ```yaml
-version: "3.8"
+version: '3.8'
 
 services:
-    db:
-        image: postgres:15
-        restart: always
-        environment:
-            POSTGRES_USER: example_user
-            POSTGRES_PASSWORD: example_password
-            POSTGRES_DB: example_db
-        ports:
-            - "5432:5432"
-        volumes:
-            - pgdata:/var/lib/postgresql/data
+  postgres:
+    image: postgres:17-alpine
+    container_name: netro_postgres
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: netro_pgadmin
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
 
 volumes:
-    pgdata:
+  postgres_data:
+  pgadmin_data:
 ```
 
 1. Save the above configuration in a `docker-compose.yml` file in root.
